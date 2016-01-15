@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}Datasets{% endblock %}
+
+{% block content %}
+
+<h3>Datasets:</h3>
+
+{% for provider_name, doc in docs.items() %}
+<table class="table table-bordered table-striped table-condensed">
+	{% set provider = doc["provider"] %}
+	{% set datasets = doc["datasets"] %}
+	<caption>
+		<h3><a target="_blank" href="{{ url_for(".provider-by-slug", slug=provider.slug) }}">{{ provider.name}}</a></h3>
+	</caption>
+	{% for dataset in datasets %}
+	<tr>
+		<td class="col-md-10">
+			<a target="_blank" href="http://widukind.cepremap.org/views/slug/dataset/{{ dataset.slug }}">{{ dataset.name }} ({{ dataset.dataset_code }})</a>
+		</td>	
+		<td class="col-md-1">
+			<a target="_blank" href="{{ url_for(".dataset-by-slug", slug=dataset.slug) }}">JSON</a>
+		</td>	
+		<td class="col-md-1">
+			<a target="_blank" href="{{ url_for("EVIEWS.values", provider=provider.name, dataset_code=dataset.dataset_code) }}">EVIEWS</a>
+		</td>	
+	</tr>			
+	{% endfor %}
+{% endfor %}
+</table>
+
+{% endblock %}

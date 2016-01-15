@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h3>Liens HTML</h3>
+<ul>
+	<li><a href="{{ url_for("COMMON.html-providers") }}">Providers</a></li>
+	<li><a href="{{ url_for("COMMON.html-datasets") }}">Datasets</a></li>
+</ul>
+
+<h3>Urls (json/eviews):</h3>
+
+<pre>
+/api/v1/providers (<a target="_blank" href="{{ request.url }}api/v1/providers">Example</a>)
+
+/api/v1/&lt;provider&gt;/provider (<a target="_blank" href="{{ request.url }}api/v1/BIS/provider">Example</a>)
+
+/api/v1/&lt;provider&gt;/categories (<a target="_blank" href="{{ request.url }}api/v1/BIS/categories">Example</a>)
+
+/api/v1/&lt;provider&gt;/datasets (<a target="_blank" href="{{ request.url }}api/v1/BIS/datasets">Example</a>)
+
+/api/v1/&lt;provider&gt;/dataset/&lt;dataset_code&gt; (<a target="_blank" href="{{ request.url }}api/v1/BIS/dataset/PP-LS">Example</a>)
+
+/api/v1/&lt;provider&gt;/dataset/&lt;dataset_code&gt;/series (<a target="_blank" href="{{ request.url }}api/v1/BIS/dataset/PP-LS/series">Example</a>)
+
+/api/v1/&lt;provider&gt;/dataset/&lt;dataset_code&gt;/values (<a target="_blank" href="{{ request.url }}api/v1/BIS/dataset/PP-LS/values">Example</a>)
+
+/EVIEWS/&lt;provider&gt;/dataset/&lt;dataset_code&gt;/values (<a target="_blank" href="{{ request.url }}EVIEWS/BIS/dataset/PP-LS/values">Example</a>)
+
+# Views by slug:
+/api/v1/slug/dataset/&lt;slug&gt;
+/api/v1/slug/provider/&lt;slug&gt;
+/api/v1/slug/series/&lt;slug&gt;
+
+</pre>
+
+
+{% endblock %}

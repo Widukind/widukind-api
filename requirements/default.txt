@@ -1,0 +1,14 @@
+https://github.com/Widukind/widukind-common/tarball/master
+pandas>=0.14.1
+python-dateutil
+arrow
+gevent>=1.1b4
+python-decouple
+pymongo>=3.0.3
+Flask-Script
+Flask-Cache
+Flask-BasicAuth
+Flask-Mail
+#TODO: redis gevent
+redis
+psutil

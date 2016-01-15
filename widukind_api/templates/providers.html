@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}Providers{% endblock %}
+
+{% block content %}
+
+<h3>Providers:</h3>
+
+<ul>
+{% for provider in providers %}
+	<li>
+		<a href="{{ url_for(".provider-by-slug", slug=provider.slug) }}">{{ provider.name}}</a>
+	</li>
+{% endfor %}
+</ul>
+
+{% endblock %}
