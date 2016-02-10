@@ -11,18 +11,21 @@
 	{% set provider = doc["provider"] %}
 	{% set datasets = doc["datasets"] %}
 	<caption>
-		<h3><a target="_blank" href="{{ url_for(".provider-by-slug", slug=provider.slug) }}">{{ provider.name}}</a></h3>
+		<h3><a target="_blank" href="{{ url_for("html.datasets-by-provider", provider=provider.name) }}">{{ provider.name}}</a></h3>
 	</caption>
 	{% for dataset in datasets %}
 	<tr>
 		<td class="col-md-10">
-			<a target="_blank" href="http://widukind.cepremap.org/views/slug/dataset/{{ dataset.slug }}">{{ dataset.name }} ({{ dataset.dataset_code }})</a>
+			<a target="_blank" href="{{config.WIDUKIND_WEB_URL}}/views/slug/dataset/{{ dataset.slug }}">{{ dataset.name }} ({{ dataset.dataset_code }})</a>
 		</td>	
 		<td class="col-md-1">
-			<a target="_blank" href="{{ url_for(".dataset-by-slug", slug=dataset.slug) }}">JSON</a>
+			<a target="_blank" href="{{ url_for("json.dataset", slug=dataset.slug) }}">JSON</a>
 		</td>	
 		<td class="col-md-1">
-			<a target="_blank" href="{{ url_for("EVIEWS.values", provider=provider.name, dataset_code=dataset.dataset_code) }}">EVIEWS</a>
+			<a target="_blank" href="{{ url_for("eviews.values", provider=dataset.provider_name, dataset_code=dataset.dataset_code) }}">EVIEWS</a>
+			{#
+			<a target="_blank" href="{{ url_for("eviews.values", dataset=dataset.slug) }}">EVIEWS</a>
+			#}
 		</td>	
 	</tr>			
 	{% endfor %}
