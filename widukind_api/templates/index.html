@@ -4,35 +4,67 @@
 
 <h3>Liens HTML</h3>
 <ul>
-	<li><a href="{{ url_for("COMMON.html-providers") }}">Providers</a></li>
-	<li><a href="{{ url_for("COMMON.html-datasets") }}">Datasets</a></li>
+	<li><a target="_blank" href="{{ url_for("html.providers") }}">Providers</a></li>
+{#
+	<li><a target="_blank" href="{{ url_for("html.datasets") }}">Datasets</a></li>
+#}
 </ul>
 
-<h3>Urls (json/eviews):</h3>
+<h3>JSON:</h3>
 
-<pre>
-/api/v1/providers (<a target="_blank" href="{{ request.url }}api/v1/providers">Example</a>)
+{#/api/v1/category/&lt;slug&gt; (<a target="_blank" href="{{ url_for("json.category", slug="bis") }}">Categories BIS</a>)#}
 
-/api/v1/&lt;provider&gt;/provider (<a target="_blank" href="{{ request.url }}api/v1/BIS/provider">Example</a>)
+<ul>
+<li>
+<a target="_blank" href="{{ url_for("json.providers") }}">All Providers</a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.categories", provider="bis") }}">Categories BIS</a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.datasets", provider="bis") }}">Datasets BIS</a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.provider", slug="bis") }}">Provider BIS</a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.dataset", slug="bis-pp-ls") }}">Dataset BIS PP-LS</a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.series-list", dataset="bis-pp-ls") }}">Dataset BIS PP-LS - All Series </a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.series", slug="bis-pp-ls-q-au") }}">Dataset BIS PP-LS - Series Q:AU - (Quarterly - Australia)</a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.series-values", slug="bis-pp-ls-q-au") }}">Series Values BIS PP-LS - Q:AU - (Quarterly - Australia)</a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.dataset-values", slug="bis-pp-ls") }}">Dataset All Values BIS PP-LS</a>
+</li>
+<li>
+<a target="_blank" href="{{ url_for("json.dataset-values", slug="bis-pp-ls") }}?Reference area=FR">Dataset Values BIS PP-LS - Dimension {{ "Reference area=FR"|safe }}</a>
+</li>
+</ul>
 
-/api/v1/&lt;provider&gt;/categories (<a target="_blank" href="{{ request.url }}api/v1/BIS/categories">Example</a>)
+<h3>Tools:</h3>
 
-/api/v1/&lt;provider&gt;/datasets (<a target="_blank" href="{{ request.url }}api/v1/BIS/datasets">Example</a>)
+<ul>
+	<li><a target="_blank" href="{{ url_for("json.dataset-dimensions-key", slug="bis-pp-ls") }}">Dataset BIS PP-LS - Dimensions Key</a></li>
+</ul>
 
-/api/v1/&lt;provider&gt;/dataset/&lt;dataset_code&gt; (<a target="_blank" href="{{ request.url }}api/v1/BIS/dataset/PP-LS">Example</a>)
+<h3>Plugin Eviews:</h3>
 
-/api/v1/&lt;provider&gt;/dataset/&lt;dataset_code&gt;/series (<a target="_blank" href="{{ request.url }}api/v1/BIS/dataset/PP-LS/series">Example</a>)
+<ul>
+	<li><a target="_blank" href="{{ url_for("eviews.values-by-slug", slug="insee-ipch-2005-fr-coicop") }}?frequency=M&limit=100">Dataset INSEE IPCH-2005-FR-COICOP</a></li>
+	<li><a target="_blank" href="{{ url_for("eviews.values-by-slug", slug="bis-pp-ls") }}">Dataset BIS PP-LS</a></li>
+</ul>
 
-/api/v1/&lt;provider&gt;/dataset/&lt;dataset_code&gt;/values (<a target="_blank" href="{{ request.url }}api/v1/BIS/dataset/PP-LS/values">Example</a>)
+<h3>Plugin R:</h3>
 
-/EVIEWS/&lt;provider&gt;/dataset/&lt;dataset_code&gt;/values (<a target="_blank" href="{{ request.url }}EVIEWS/BIS/dataset/PP-LS/values">Example</a>)
-
-# Views by slug:
-/api/v1/slug/dataset/&lt;slug&gt;
-/api/v1/slug/provider/&lt;slug&gt;
-/api/v1/slug/series/&lt;slug&gt;
-
-</pre>
+<ul>
+	<li><a target="_blank" href="{{ url_for("r.series", slug="eurostat-namq-10-a10-e-q-ths-hw-total-swda-emp-dc-ea19") }}">Dataset Eurostat - namq_10_a10_e - Series Q.THS_HW.TOTAL.SWDA.EMP_DC.EA19</a></li>
+</ul>
 
 
 {% endblock %}

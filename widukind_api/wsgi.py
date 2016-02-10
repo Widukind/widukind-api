@@ -206,12 +206,28 @@ def _conf_processors(app):
         return dict(split=_split)
     
 def _conf_bp(app):
-    from widukind_api.plugins import eviews
-    from widukind_api.plugins import common
-    app.register_blueprint(eviews.bp, url_prefix='/EVIEWS')    
-    app.register_blueprint(common.bp, url_prefix='/api/v1')    
-
+    from widukind_api.plugins import html_plugin
+    from widukind_api.plugins import eviews_plugin
+    from widukind_api.plugins import json_plugin
+    from widukind_api.plugins import r_plugin
+    app.register_blueprint(html_plugin.bp, url_prefix='/api/v1/html')    
+    app.register_blueprint(json_plugin.bp, url_prefix='/api/v1/json')    
+    app.register_blueprint(eviews_plugin.bp, url_prefix='/api/v1/eviews')
+    app.register_blueprint(r_plugin.bp, url_prefix='/api/v1/r')
+    
 def _conf_errors(app):
+    
+    from werkzeug import exceptions as ex
+
+    class DisabledElement(ex.HTTPException):
+        code = 307
+        description = 'Disabled element'
+    abort.mapping[307] = DisabledElement
+
+    @app.errorhandler(307)
+    def disable_error(error):
+        values = dict(error="307 Error", original_error=str(error), referrer=request.referrer)
+        return app.jsonify(values)
     
     @app.errorhandler(500)
     def error_500(error):
@@ -232,6 +248,46 @@ def _conf_jsonify(app):
         return current_app.response_class(content, mimetype='application/json')
 
     app.jsonify = jsonify
+    
+def _conf_periods(app):
+    
+    import pandas
+    
+    def get_ordinal_from_period(date_str, freq=None):
+        if not freq in constants.CACHE_FREQUENCY:
+            return pandas.Period(date_str, freq=freq).ordinal
+        
+        key = "p-to-o-%s.%s" % (date_str, freq)
+        value = cache.get(key)
+        if value:
+            return value
+        
+        value = pandas.Period(date_str, freq=freq).ordinal
+        cache.set(key, value, timeout=300)
+        return value
+    
+    def get_period_from_ordinal(date_ordinal, freq=None):
+        if not freq in constants.CACHE_FREQUENCY:
+            return str(pandas.Period(ordinal=date_ordinal, freq=freq))
+    
+        key = "o-to-p-%s.%s" % (date_ordinal, freq)
+        value = cache.get(key)
+        if value:
+            return value
+        
+        value = str(pandas.Period(ordinal=date_ordinal, freq=freq))
+        cache.set(key, value, timeout=300)
+        return value
+    
+    app.get_ordinal_from_period = get_ordinal_from_period
+    app.get_period_from_ordinal = get_period_from_ordinal
+    
+    @app.context_processor
+    def convert_pandas_period():
+        def convert(date_ordinal, frequency):
+            return get_period_from_ordinal(date_ordinal, frequency)
+        return dict(pandas_period=convert)
+    
 
 def create_app(config='widukind_api.settings.Prod'):
     
@@ -268,6 +324,8 @@ def create_app(config='widukind_api.settings.Prod'):
     _conf_bp(app)
     
     _conf_processors(app)
+    
+    _conf_periods(app)
     
     _conf_auth(app)
     

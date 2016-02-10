@@ -9,7 +9,7 @@
 <ul>
 {% for provider in providers %}
 	<li>
-		<a href="{{ url_for(".provider-by-slug", slug=provider.slug) }}">{{ provider.name}}</a>
+		<a href="{{ url_for("html.datasets-by-provider", provider=provider.slug) }}">{{ provider.name}}</a>
 	</li>
 {% endfor %}
 </ul>

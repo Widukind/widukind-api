@@ -1,0 +1,27 @@
+<table>
+<thead>
+<tr>
+	<th>Dates</th>
+	{% for key in series_keys %}
+	<th>{{ key }}</th>
+	{% endfor %}
+</tr>
+<tr>
+	<th>&nbsp;</th>
+	{% for name in series_names %}
+	<th>{{ name }}</th>
+	{% endfor %}
+</tr>
+</thead>
+<tbody>
+{% for date in dates %}
+{% set index = loop.index0 %}
+<tr>
+	<td>{{date}}</td>	
+	{% for cols in values %}
+		<td>{{cols[index]}}</td>
+	{% endfor %}
+</tr>
+{% endfor %}	
+</tbody>
+</table>

@@ -7,6 +7,8 @@ gettext = lambda s: s
 
 class Config(object):
     
+    WIDUKIND_WEB_URL = config('WIDUKIND_WEB_URL', "http://widukind.cepremap.org")
+    
     GOOGLE_ANALYTICS_ID = config('WIDUKIND_API_GOOGLE_ANALYTICS_ID', None)
     
     CACHE_TYPE = config('WIDUKIND_CACHE_TYPE', "simple")
