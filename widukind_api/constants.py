@@ -6,6 +6,9 @@ SESSION_LANG_KEY = "current_lang"
 SESSION_TIMEZONE_KEY = "current_tz"
 SESSION_THEME_KEY = "current_theme"
 
+COL_SESSION = "session_api"
+COL_ALL.append(COL_SESSION)
+
 CHOICES_SORT_DATASETS = (
     ('provider_name', 'provider_name'),
     ("dataset_code", "dataset"),

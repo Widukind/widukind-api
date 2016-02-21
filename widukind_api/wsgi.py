@@ -169,7 +169,8 @@ def _conf_db(app):
 
 def _conf_session(app):
     from widukind_api.mongo_session import PyMongoSessionInterface
-    app.session_interface = PyMongoSessionInterface(app.widukind_db)
+    app.session_interface = PyMongoSessionInterface(app.widukind_db,
+                                                    collection=constants.COL_SESSION)
     
 def _conf_cache(app):
     """
@@ -178,6 +179,13 @@ def _conf_cache(app):
     @cache.memoize(50)
     """
     cache.init_app(app)
+
+def _conf_limiter(app):
+    extensions.limiter.init_app(app)
+    
+def _conf_compress(app):
+    from flask_compress import Compress
+    Compress(app)        
     
 def _conf_default_views(app):
 
@@ -210,10 +218,12 @@ def _conf_bp(app):
     from widukind_api.plugins import eviews_plugin
     from widukind_api.plugins import json_plugin
     from widukind_api.plugins import r_plugin
+    from widukind_api.plugins import sdmx_plugin
     app.register_blueprint(html_plugin.bp, url_prefix='/api/v1/html')    
     app.register_blueprint(json_plugin.bp, url_prefix='/api/v1/json')    
     app.register_blueprint(eviews_plugin.bp, url_prefix='/api/v1/eviews')
     app.register_blueprint(r_plugin.bp, url_prefix='/api/v1/r')
+    app.register_blueprint(sdmx_plugin.bp, url_prefix='/api/v1/sdmx')    
     
 def _conf_errors(app):
     
@@ -314,6 +324,10 @@ def create_app(config='widukind_api.settings.Prod'):
     _conf_errors(app)
     
     _conf_cache(app)
+    
+    _conf_limiter(app)
+    
+    _conf_compress(app)
     
     _conf_converters(app)
     
