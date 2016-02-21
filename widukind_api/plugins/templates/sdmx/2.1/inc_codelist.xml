@@ -1,0 +1,12 @@
+    <str:Codelists>
+      {%- for key, cl in dataset.codelists.items() %}
+      <str:Codelist id="{{ key }}" urn="urn:sdmx:org.sdmx.infomodel.codelist.Codelist=WIDUKIND:{{ key }}({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
+        <com:Name xml:lang="en">{{dataset.concepts[key]}}</com:Name>
+        {%- for k, v in cl.items() %}
+        <str:Code id="{{k}}" urn="urn:sdmx:org.sdmx.infomodel.codelist.Code=WIDUKIND:{{ key }}({{ version }}).{{ k }}">
+          <com:Name xml:lang="en">{{v}}</com:Name>
+        </str:Code>
+        {% endfor -%}
+      </str:Codelist>
+      {% endfor -%}
+    </str:Codelists>

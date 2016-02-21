@@ -1,0 +1,10 @@
+    <str:Dataflows>
+    {% for dataset in datasets %}
+      <str:Dataflow id="{{dataset.dataset_code}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.Dataflow=WIDUKIND:{{dataset.dataset_code}}({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
+        <com:Name xml:lang="en">{{dataset.name}}</com:Name>
+        <str:Structure>
+          <Ref id="{{dataset.dataset_code}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="datastructure" class="DataStructure"/>
+        </str:Structure>
+      </str:Dataflow>
+    {% endfor %}
+    </str:Dataflows>

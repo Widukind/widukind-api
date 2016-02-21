@@ -1,0 +1,33 @@
+<?xml version="{{ version }}" encoding="UTF-8"?>
+<message:StructureSpecificData 
+	xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" 
+	xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common" 
+	xmlns:data="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/structurespecific"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:widukind="urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=WIDUKIND:{{dataset_code}}({{ version }}):ObsLevelDim:TIME_PERIOD">
+<message:Header>
+	<message:ID>{{message_id}}</message:ID>
+	<message:Test>false</message:Test>
+	<message:Prepared>{{prepared_date}}</message:Prepared>
+	<message:Sender id="WIDUKIND"/>
+	<message:Structure structureID="{{dataset_code}}" dimensionAtObservation="TIME_PERIOD" namespace="urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=WIDUKIND:{{dataset_code}}({{ version }}):ObsLevelDim:TIME_PERIOD">
+		<common:Structure>
+			<URN>urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=WIDUKIND:{{dataset_code}}({{ version }})</URN>
+		</common:Structure>
+	</message:Structure>
+</message:Header>
+<message:DataSet 
+	data:action="Replace" 
+	data:validFromDate="{{validFromDate}}" 
+	data:structureRef="{{dataset_code}}" 
+	data:dataScope="DataStructure" 
+	xsi:type="widukind:DataSetType">
+{%- for series in objects %}
+<Series WIDUKIND_ID="{{ series.key }}" WIDUKIND_NAME="{{ series.name }}" {% if series.dimensions %}{% for k, v in series.dimensions.items() -%} {{k}}="{{v}}" {% endfor -%}{% endif %} {% if series.attributes %}{% for k, v in series.attributes.items() -%} {{k}}="{{v}}" {% endfor -%}{% endif %}>
+{%- for obs in series["values"] %}
+<Obs TIME_PERIOD="{{ obs.period }}" OBS_VALUE="{{ obs.value }}" {% if obs.attributes -%}{% for k, v in obs.attributes.items() -%} {{k}}="{{v}}" {% endfor -%}{%- endif -%}/>
+{%- endfor %}
+</Series>
+{%- endfor %}
+</message:DataSet>
+</message:StructureSpecificData>

@@ -1,0 +1,19 @@
+<?xml version="{{ version }}" encoding="UTF-8"?>
+<mes:Structure 
+	xmlns:mes="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" 
+	xmlns:com="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common" 
+	xmlns:str="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure">
+  <mes:Header>
+    <mes:ID>{{message_id}}</mes:ID>
+    <mes:Test>false</mes:Test>
+    <mes:Prepared>{{prepared_date}}</mes:Prepared>
+    <mes:Sender id="WIDUKIND"/>
+    <mes:Receiver id="unknown"/>
+  </mes:Header>
+  <mes:Structures>
+    {% include "2.1/inc_codelist.xml" with context %}
+    {% if load_all %}
+    {% include "2.1/inc_conceptscheme.xml" with context %}
+    {% endif %}    
+  </mes:Structures>
+</mes:Structure>

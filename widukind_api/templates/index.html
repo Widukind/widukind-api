@@ -60,6 +60,56 @@
 	<li><a target="_blank" href="{{ url_for("eviews.values-by-slug", slug="bis-pp-ls") }}">Dataset BIS PP-LS</a></li>
 </ul>
 
+<h3>SDMX 2.1 XML</h3>
+
+<ul>
+	<li>
+		<a target="_blank" href="{{ url_for("sdmx.2-1-dataflow") }}">
+			Dataflow - All Providers
+		</a> 
+	</li>		
+	<li>
+		<a target="_blank" href="{{ url_for("sdmx.2-1-dataflow-agency", agencyID="INSEE") }}">
+			Dataflow - INSEE
+		</a> 
+	</li>	
+	<li>
+		<a target="_blank" href="{{ url_for("sdmx.2-1-dataflow-dataset", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}">
+			Dataflow - INSEE - IPC-2015-COICOP
+		</a> 
+	</li>	
+	
+	<li>
+		<a target="_blank" href="{{ url_for("sdmx.2-1-datastructure", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}">
+			DataStructure - INSEE - IPC-2015-COICOP
+		</a> 
+	</li>
+	<li>
+		<a target="_blank" href="{{ url_for("sdmx.2-1-datastructure", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}?references=all">
+			DataStructure Complète - INSEE - IPC-2015-COICOP
+		</a> 
+	</li>
+	<li>
+		<a target="_blank" href="{{ url_for("sdmx.2-1-data-specific", providerRef="INSEE", flowRef="IPC-2015-COICOP", key="A.011141.FE.INDICE") }}?startPeriod=2011&endPeriod=2014">
+			Data - INSEE - IPC-2015-COICOP - Series 001764374
+		</a> 
+		(<a target="_blank" href="{{config.WIDUKIND_WEB_URL}}/views/slug/series/insee-ipc-2015-coicop-001764374">Web</a>)
+	</li>
+	
+	<li>
+		<a target="_blank" href="{{ url_for("sdmx.2-1-conceptscheme", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}">
+			ConceptScheme - INSEE - IPC-2015-COICOP
+		</a> 
+	</li>
+
+	<li>
+		<a target="_blank" href="{{ url_for("sdmx.2-1-codelist", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}">
+			CodeList - INSEE - IPC-2015-COICOP
+		</a> 
+	</li>
+	
+</ul>
+
 <h3>Plugin R:</h3>
 
 <ul>

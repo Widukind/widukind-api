@@ -1,0 +1,20 @@
+    <str:Concepts>
+      <str:ConceptScheme id="{{dataset.provider_name}}_CONCEPTS" urn="urn:sdmx:org.sdmx.infomodel.conceptscheme.ConceptScheme=WIDUKIND:{{dataset.provider_name}}_CONCEPTS({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
+        <com:Name xml:lang="en">{{dataset.provider_name}} concepts</com:Name>
+        {%- for key, concept in dataset.concepts.items() %}
+        <str:Concept id="{{key}}" urn="urn:sdmx:org.sdmx.infomodel.conceptscheme.Concept=WIDUKIND:{{dataset.provider_name}}_CONCEPTS({{ version }}).{{ key }}">
+          <com:Name xml:lang="en">{{concept}}</com:Name>
+        </str:Concept>
+        {% endfor -%}
+        {% if not time_period_concept %}
+        <str:Concept id="TIME_PERIOD" urn="urn:sdmx:org.sdmx.infomodel.conceptscheme.Concept=WIDUKIND:{{dataset.provider_name}}_CONCEPTS({{ version }}).TIME_PERIOD">
+          <com:Name xml:lang="en">Time period or range</com:Name>
+        </str:Concept>
+        {% endif -%}
+        {% if not obs_value_concept %}
+        <str:Concept id="OBS_VALUE" urn="urn:sdmx:org.sdmx.infomodel.conceptscheme.Concept=WIDUKIND:{{dataset.provider_name}}_CONCEPTS({{ version }}).OBS_VALUE">
+          <com:Name xml:lang="en">Observation value</com:Name>
+        </str:Concept>
+        {% endif -%}                
+      </str:ConceptScheme>
+    </str:Concepts>
