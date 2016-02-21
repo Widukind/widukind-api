@@ -1,0 +1,95 @@
+<?xml version="{{ version }}" encoding="UTF-8"?>
+<mes:Structure 
+	xmlns:mes="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" 
+	xmlns:com="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common" 
+	xmlns:str="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure">
+  <mes:Header>
+    <mes:ID>{{message_id}}</mes:ID>
+    <mes:Test>false</mes:Test>
+    <mes:Prepared>{{prepared_date}}</mes:Prepared>
+    <mes:Sender id="WIDUKIND"/>
+    <mes:Receiver id="unknown"/>
+  </mes:Header>
+  <mes:Structures>
+    {% if load_all %}
+    {% include "2.1/inc_dataflow.xml" with context %}
+    {% include "2.1/inc_codelist.xml" with context %}
+    {% include "2.1/inc_conceptscheme.xml" with context %}
+    {% endif %}    
+    <str:DataStructures>
+      <str:DataStructure id="{{dataset.dataset_code}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=WIDUKIND:{{dataset.dataset_code}}({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
+        <com:Name xml:lang="en">{{dataset.name}}</com:Name>
+        <str:DataStructureComponents>
+          <str:DimensionList id="DimensionDescriptor" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DimensionDescriptor=WIDUKIND:{{dataset.dataset_code}}({{ version }}).DimensionDescriptor">
+          	{%- for key in dataset.dimension_keys %}
+            <str:Dimension id="{{key}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.Dimension=WIDUKIND:{{dataset.dataset_code}}({{ version }}).{{ key }}" position="{{loop.index}}">
+              <str:ConceptIdentity>
+                <Ref id="{{key}}" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
+              </str:ConceptIdentity>
+              <str:LocalRepresentation>
+                <str:Enumeration>
+                  <Ref id="{{key}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="codelist" class="Codelist"/>
+                </str:Enumeration>
+              </str:LocalRepresentation>
+            </str:Dimension>
+            {% endfor -%}
+            <str:TimeDimension id="TIME_PERIOD" urn="urn:sdmx:org.sdmx.infomodel.datastructure.TimeDimension=WIDUKIND:{{dataset.dataset_code}}({{ version }}).TIME_PERIOD" position="{{dataset.dimension_keys|length+1}}">
+              <str:ConceptIdentity>
+                <Ref id="TIME_PERIOD" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
+              </str:ConceptIdentity>
+              <str:LocalRepresentation>
+                <str:TextFormat textType="ObservationalTimePeriod"/>
+              </str:LocalRepresentation>
+            </str:TimeDimension>
+          </str:DimensionList>
+          <!-- 
+          {#
+          TODO: <str:Attribute id="OBS_CONF" assignmentStatus="Conditional">
+          #}
+           -->
+          
+          {% if dataset.attribute_keys %}
+          <str:AttributeList id="AttributeDescriptor" urn="urn:sdmx:org.sdmx.infomodel.datastructure.AttributeDescriptor=WIDUKIND:{{dataset.dataset_code}}({{ version }}).AttributeDescriptor">
+          	{%- for key in dataset.attribute_keys %}
+            <str:Attribute id="{{key}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DataAttribute=WIDUKIND:{{dataset.dataset_code}}({{ version }}).{{ key }}" assignmentStatus="Conditional">
+              {#TODO: verif is in concepts ?#}
+              <str:ConceptIdentity>
+                <Ref id="{{key}}" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
+              </str:ConceptIdentity>
+              {% if key in dataset.codelists %}
+              <str:LocalRepresentation>
+                <str:Enumeration>
+                  <Ref id="{{key}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="codelist" class="Codelist"/>
+                </str:Enumeration>
+              </str:LocalRepresentation>
+              {% else %}
+              <str:LocalRepresentation>
+                <str:TextFormat textType="String"/>
+              </str:LocalRepresentation>
+              {% endif %}
+              {# TODO: usage
+              <str:AttributeRelationship>
+                <str:Dimension>
+                  <Ref id="FREQ"/>
+                </str:Dimension>
+                <str:Dimension>
+                  <Ref id="PRODUIT"/>
+                </str:Dimension>
+              </str:AttributeRelationship>
+              #}              
+            </str:Attribute>
+            {% endfor -%}
+          </str:AttributeList>
+          {% endif -%}
+          <str:MeasureList id="MeasureDescriptor" urn="urn:sdmx:org.sdmx.infomodel.datastructure.MeasureDescriptor=WIDUKIND:{{dataset.dataset_code}}({{ version }}).MeasureDescriptor">
+            <str:PrimaryMeasure id="OBS_VALUE">
+              <str:ConceptIdentity>
+                <Ref id="OBS_VALUE" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
+              </str:ConceptIdentity>
+            </str:PrimaryMeasure>
+          </str:MeasureList>
+        </str:DataStructureComponents>
+      </str:DataStructure>
+    </str:DataStructures>
+  </mes:Structures>
+</mes:Structure>

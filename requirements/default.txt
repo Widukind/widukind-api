@@ -12,3 +12,5 @@ Flask-Mail
 #TODO: redis gevent
 redis
 psutil
+Flask-Limiter
+flask-compress

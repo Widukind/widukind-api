@@ -9,17 +9,28 @@ class Config(object):
     
     WIDUKIND_WEB_URL = config('WIDUKIND_WEB_URL', "http://widukind.cepremap.org")
     
+    NO_LIMITED_IPS = []
+    NO_LIMITED_COUNTRIES = []
+    
     GOOGLE_ANALYTICS_ID = config('WIDUKIND_API_GOOGLE_ANALYTICS_ID', None)
     
     CACHE_TYPE = config('WIDUKIND_CACHE_TYPE', "simple")
     CACHE_KEY_PREFIX = "widukind_api"
+    
     ENABLE_CACHE = config('WIDUKIND_API_ENABLE_CACHE', True, cast=bool)
-    ENABLE_REDIS = config('WIDUKIND_API_ENABLE_REDIS', True, cast=bool)
+    
+    ENABLE_REDIS = config('WIDUKIND_API_ENABLE_REDIS', False, cast=bool)
     
     CACHE_REDIS_URL = config('WIDUKIND_REDIS_URL', 'redis://localhost:6379/0')
+    
     if ENABLE_CACHE and ENABLE_REDIS:
         CACHE_TYPE = "redis"
         CACHE_REDIS_URL = config('WIDUKIND_REDIS_URL', 'redis://localhost:6379/0')
+        RATELIMIT_STORAGE_URL = config('WIDUKIND_REDIS_URL', 'redis://localhost:6379/0')
+    else:
+        RATELIMIT_ENABLED = False
+        
+    RATELIMIT_HEADERS_ENABLED = True
     
     MONGODB_URL = config('WIDUKIND_MONGODB_URL', 'mongodb://localhost/widukind')
     
@@ -30,6 +41,12 @@ class Config(object):
     SENTRY_DSN = config('WIDUKIND_API_SENTRY_DSN', None)
     
     SESSION_ENGINE_ENABLE = config('WIDUKIND_API_SESSION_ENGINE_ENABLE', False, cast=bool)
+
+    #---Flask-Compress
+    COMPRESS_LEVEL = 6
+    COMPRESS_MIN_SIZE = 500
+    COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml',
+                          'application/json', 'application/xml']
 
     #---Flask-Babel
     TIMEZONE = "UTC"#"Europe/Paris" 
@@ -89,6 +106,10 @@ class Test(Config):
     CACHE_TYPE = "null"
     
     MAIL_SUPPRESS_SEND = True
+    
+    ENABLE_REDIS = False
+    
+    RATELIMIT_ENABLED = False
     
 
 class Custom(Config):
