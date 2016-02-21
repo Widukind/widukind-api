@@ -48,12 +48,23 @@ def _show_urls():
         #rule.rule = str passé au début de route()
         print("%-30s" % rule.rule, rule.endpoint, methods)
     
+def _cache_clear(app=None):
+    app = app or current_app
+    with app.app_context():
+        from widukind_api.extensions import cache
+        cache.clear()
 
 class ShowUrlsCommand(Command):
     """Affiche les urls"""
 
     def run(self, **kwargs):
         _show_urls()
+
+class CacheClearCommand(Command):
+    """Cache Clear"""
+
+    def run(self, **kwargs):
+        _cache_clear()
 
 class ShowConfigCommand(Command):
     """Affiche la configuration actuelle de l'application"""
@@ -109,6 +120,8 @@ def main(create_app_func=None):
 
     manager.add_command("config", ShowConfigCommand())
     manager.add_command("urls", ShowUrlsCommand())
+    manager.add_command("cache-clear", CacheClearCommand())
+    
     
     manager.run()
     
