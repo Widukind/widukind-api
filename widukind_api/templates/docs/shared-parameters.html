@@ -1,0 +1,50 @@
+<h2><small>Parameters:</small></h2>
+
+<h3>limit</h3>
+<div class="well well-sm">
+<p><strong>The maximum number of results to return</strong></p>
+<ul>
+	<li>Required: false</li>
+	<li>Type: int</li>	
+	<li>Default: 1000</li>	
+	<li>Example: ?limit=1000</li>	
+</ul>
+</div>
+
+<h3>frequency</h3>
+<div class="well well-sm">
+<p><strong>Frequency filter</strong></p>
+<ul>
+	<li>Required: false</li>
+	<li>Type: str</li>	
+	<li>Default: None</li>	
+	<li>Example: ?frequency=Q</li>	
+	<li>Available values (depend dataset): A, Q, M, W</li>	
+</ul>
+</div>
+
+<h3>&lt;dimension_or_attribute&gt;</h3>
+<div class="well well-sm">
+<p><strong>Dimension or attribute filter</strong></p>
+<ul>
+	<li>Required: false</li>
+	<li>Type: string</li>	
+	<li>Default: None</li>	
+	<li>Example: ?reference-area=FR (only series with dimension reference-area=FR)</li>	
+	<li>Example: ?reference-area=!FR (exclude series with dimension reference-area=FR)</li>	
+	<li>Example: ?reference-area=!fr+de+au (exclude FR and select DE+AU)</li>	
+</ul>
+</div>
+
+<h3>tags</h3>
+<div class="well well-sm">
+<p><strong>Tags filter</strong></p>
+<ul>
+	<li>Required: false</li>
+	<li>Type: str</li>	
+	<li>Default: None</li>	
+	<li>Example: ?tags=france</li>	
+	<li>Example: ?tags=france+australia</li>	
+	<li>Example: ?tags=fr+au</li>	
+</ul>
+</div>

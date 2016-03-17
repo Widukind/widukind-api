@@ -1,0 +1,222 @@
+{% extends "layout.html" %}
+
+{% block css %}
+	{{super()}}
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/atelier-cave.light.min.css">
+	<style>
+	ul {
+		padding-left: 20px;
+	}
+	</style>
+{% endblock %}
+
+{% macro table(id, uri, help) %}
+<table class="table table-bordered table-hover">
+	<tbody>
+	<tr>
+		<td class="col-md-4 active">
+			<a data-toggle="collapse" href="#{{id}}" aria-expanded="false" aria-controls="{{id}}">
+			  {{uri}}
+			</a>	
+		</td>
+		<td class="col-md-8 info">
+			{{help}}
+		</td>
+	</tr>
+	</tbody>
+</table>
+{% endmacro %}
+
+{% macro collapsed(id, url) %}
+<div class="collapse" id="{{ id }}">
+	{% if caller %}
+	{{ caller() }}
+	{% endif %}
+	<div class="well">
+		<div class="input-group input-group-lg">
+			<input type="text" class="form-control" value="{{ url }}">
+		    <span class="input-group-btn"><button class="btn btn-primary ajax" type="button">Run</button></span>
+		    <span class="input-group-btn"><button class="btn btn-info clear" type="button">Clear</button></span>
+		</div>
+	</div>
+	<pre class="json"></pre>
+</div>	
+{% endmacro %}
+
+{% block content %}
+
+<span id="spinner" class="spinner-container"></span>
+
+<div class="page-header">
+  <h1>JSON Rest API for Widukind</h1>
+</div>
+
+<div class="well well-sm">
+<ul>
+	<li>Add <strong>/api/v1/json</strong> before all uris. Example: for /providers use <strong>/api/v1/json/providers</strong></li>
+	<li>Normal result contains always<code>{"meta": {}, "data": []}</code></li>
+	<li>Error result contains always<code>{"code": 404, "original_error": "404: Not Found", "error": "404 Error"}</code></li>
+	<li>HTTP result code is always <strong>200</strong></li>
+	<li>Use filters when availables</li>
+</ul>
+
+</div>
+
+<h2>Providers:</h2>
+
+{{ table("providers-list", "/providers", "All Providers list") }}
+{{ collapsed("providers-list", url_for("json.providers-list", _external=True)) }}
+
+{{ table("providers-list-keys", "/providers/keys", "All Providers keys") }}
+{{ collapsed("providers-list-keys", url_for("json.providers-list-keys", _external=True)) }}
+
+{{ table("providers-unit", "/providers/<provider>", "One Provider") }}
+{{ collapsed("providers-unit", url_for("json.providers-unit", provider="bis", _external=True)) }}
+
+{{ table("providers-datasets-list-keys", "/providers/<provider>/datasets/keys", "All datasets keys for this provider") }}
+{{ collapsed("providers-datasets-list-keys", url_for("json.providers-datasets-list-keys", provider="bis", _external=True)) }}
+
+{{ table("providers-datasets-list", "/providers/<provider>/datasets", "All datasets list for this provider") }}
+{{ collapsed("providers-datasets-list", url_for("json.providers-datasets-list", provider="bis", _external=True)) }}
+
+<h2>Datasets:</h2>
+
+{{ table("datasets-unit", "/datasets/<dataset>", "One Dataset") }}
+{{ collapsed("datasets-unit", url_for("json.datasets-unit", dataset="bis-pp-ls", _external=True)) }}
+
+{{ table("datasets-series-list", "/datasets/<dataset>/series", "Series list (exclude values)") }}
+{% call collapsed("datasets-series-list", url_for("json.datasets-series-list", dataset="bis-pp-ls", _external=True)+"?reference-area=fr+au") %}
+{% include "docs/shared-parameters.html" %}
+{% endcall %}
+
+{{ table("datasets-series-list-values", "/datasets/<dataset>/values", "Series list values (only values, key, name and slug)") }}
+{% call collapsed("datasets-series-list-values", url_for("json.datasets-series-list-values", dataset="bis-pp-ls", _external=True)+"?reference-area=fr+au") %}
+{% include "docs/shared-parameters.html" %}
+{% endcall %}
+
+{{ table("datasets-unit-frequencies", "/datasets/<dataset>/frequencies", "Frequencies availables") }}
+{{ collapsed("datasets-unit-frequencies", url_for("json.datasets-unit-frequencies", dataset="bis-pp-ls", _external=True)) }}
+
+{{ table("datasets-dimensions-keys", "/datasets/<dataset>/dimensions/keys", "Dimension keys for this dataset") }}
+{{ collapsed("datasets-dimensions-keys", url_for("json.datasets-dimensions-keys", dataset="bis-pp-ls", _external=True)) }}
+
+{{ table("datasets-dimensions-list", "/datasets/<dataset>/dimensions", "Dimension list for this dataset") }}
+{{ collapsed("datasets-dimensions-list", url_for("json.datasets-dimensions-list", dataset="bis-pp-ls", _external=True)) }}
+
+{{ table("datasets-attributes-keys", "/datasets/<dataset>/attributes/keys", "Attribute keys for this dataset") }}
+{{ collapsed("datasets-attributes-keys", url_for("json.datasets-attributes-keys", dataset="insee-ipch-2015-fr-coicop", _external=True)) }}
+
+{{ table("datasets-attributes-list", "/datasets/<dataset>/attributes", "Attribute list for this dataset") }}
+{{ collapsed("datasets-attributes-list", url_for("json.datasets-attributes-list", dataset="insee-ipch-2015-fr-coicop", _external=True)) }}
+
+{{ table("datasets-codelists", "/datasets/<dataset>/codelists", "Codelist (dimensions and attributes) for this dataset") }}
+{{ collapsed("datasets-codelists", url_for("json.datasets-codelists", dataset="insee-ipch-2015-fr-coicop", _external=True)) }}
+
+
+<h2>Series:</h2>
+
+{{ table("series-unit", "/series/<series>", "One series") }}
+{{ collapsed("series-unit", url_for("json.series-unit", series="bis-pp-ls-q-au", _external=True)) }}
+
+
+{% endblock content %}
+
+{% block scripts %}
+	{{super()}}
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js" type="text/javascript"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/languages/json.min.js" type="text/javascript"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.1/URI.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename="vendors/jquery.spin.js") }}"></script>
+	
+    <script type="text/javascript">
+    
+    var widukind_options = {
+   	    spin_opts: {
+   	          lines: 13 // The number of lines to draw
+   	        , length: 28 // The length of each line
+   	        , width: 14 // The line thickness
+   	        , radius: 42 // The radius of the inner circle
+   	        , scale: 3 // Scales overall size of the spinner
+   	        , corners: 1 // Corner roundness (0..1)
+   	        , color: '#000' // #rgb or #rrggbb or array of colors
+   	        , opacity: 0.2 // Opacity of the lines
+   	        , rotate: 0 // The rotation offset
+   	        , direction: 1 // 1: clockwise, -1: counterclockwise
+   	        , speed: 1 // Rounds per second
+   	        , trail: 60 // Afterglow percentage
+   	        , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+   	        , zIndex: 2e9 // The z-index (defaults to 2000000000)
+   	        , className: 'spinner' // The CSS class to assign to the spinner
+   	        , top: '50%' // Top position relative to parent
+   	        , left: '50%' // Left position relative to parent
+   	        , shadow: true // Whether to render a shadow
+   	        , hwaccel: false // Whether to use hardware acceleration
+   	        , position: 'absolute' // Element positioning
+   	    }
+   	};
+    
+    function spinnerShow(){
+        $('#spinner').spin(widukind_options.spin_opts);
+    }
+
+    function spinnerHide(){
+        $('#spinner').spin(false);
+    }
+    
+    hljs.configure({
+    	useBR: false,
+    	languages: ["json"],
+    	tabReplace: '   ',
+    });
+    
+    $(document).ready(function(){
+
+        $(document).ajaxStart(function() {
+            spinnerShow();
+        }).ajaxStop(function() {
+            spinnerHide();
+        }).ajaxError(function() {
+            spinnerHide();
+        });
+        
+    	
+    	function highlight_run(){
+	    	$('pre').each(function(i, block) {
+				hljs.highlightBlock(block);
+	    	});
+    	}
+    	
+        $(".ajax").click(function(e){
+            e.preventDefault();
+            var button = $(this);
+            var input_field = button.parent().parent().find("input:first");
+            var output_field = button.parent().parent().parent().parent().find("pre:first");
+            var url = input_field.val();
+            var _uri = URI(url).resource();
+ 		   	$.ajax({
+		        url: _uri,
+		        complete: function(jqXHR, textStatus){
+		        	output_field.html(jqXHR.responseText);
+		        	highlight_run();
+		        }
+		   	}).done(function (data, textStatus, xhr) {
+		   		console.log(xhr.getAllResponseHeaders());
+		   		//console.log(xhr.getResponseHeader());
+		   	});
+        });
+        
+        $(".clear").click(function(e){
+            e.preventDefault();
+            var button = $(this);
+            var output_field = button.parent().parent().parent().parent().find("pre:first");
+            output_field.empty();
+        });
+        
+    	
+    });
+    
+    </script>
+	
+{% endblock %}
