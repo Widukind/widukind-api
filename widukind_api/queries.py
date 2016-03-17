@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import re
 from datetime import datetime
 import uuid
 import time
 import logging
 from pprint import pprint
 
-from flask import current_app, abort
+from flask import current_app, abort, request
 
 from widukind_api import constants
 
@@ -181,4 +182,50 @@ def data_query(dataset_code, provider_name=None, filters=None,
         "validFromDate": now,
         "objects": docs,
     }
+
+def complex_queries_series(query={}):
+
+    tags = request.args.get('tags', None)
+    
+    search_fields = []
+
+    for r in request.args.lists():
+        if r[0] in ['limit', 'tags']:
+            continue
+        elif r[0] == 'frequency':
+            query['frequency'] = r[1][0]
+        else:
+            search_fields.append((r[0], r[1][0]))
+
+    if tags and len(tags.split()) > 0:
+        tags = tags.split()
+        tags_regexp = [re.compile('.*%s.*' % e, re.IGNORECASE) for e in tags]
+        query["tags"] = {"$in": tags_regexp}
+        
+    if search_fields:
+        query_or = []
+        query_nor = []
+        
+        for field, value in search_fields:
+            values = value.split()
+            value = [v.lower().strip() for v in values]
+            
+            for v in value:
+                if v.startswith("!"):
+                    query_nor.append({"dimensions.%s" % field.lower(): v[1:]})
+                    query_nor.append({"attributes.%s" % field.lower(): v[1:]})
+                else:
+                    query_or.append({"dimensions.%s" % field.lower(): v})
+                    query_or.append({"attributes.%s" % field.lower(): v})
+
+        if query_or:
+            query["$or"] = query_or
+        if query_nor:
+            query["$nor"] = query_nor
+
+    print("-----complex query-----")
+    pprint(query)    
+    print("-----------------------")
+        
+    return query
 

@@ -191,9 +191,12 @@ def _conf_default_views(app):
 
     @app.route("/", endpoint="home")
     def index():
-        if request.is_xhr:
-            return app.jsonify({})
-        return render_template("index.html")
+        return render_template("docs/json.html")
+        #return render_template("index.html")
+
+    @app.route("/docs/json", endpoint="docs-json")
+    def docs_json():
+        return render_template("docs/json.html")
 
 def _conf_auth(app):
     extensions.auth.init_app(app)
@@ -219,6 +222,9 @@ def _conf_bp(app):
     from widukind_api.plugins import json_plugin
     from widukind_api.plugins import r_plugin
     from widukind_api.plugins import sdmx_plugin
+    #from widukind_api.plugins import rest_json
+    #app.register_blueprint(rest_json.bp, url_prefix='/api/v1/json2')    
+    
     app.register_blueprint(html_plugin.bp, url_prefix='/api/v1/html')    
     app.register_blueprint(json_plugin.bp, url_prefix='/api/v1/json')    
     app.register_blueprint(eviews_plugin.bp, url_prefix='/api/v1/eviews')
@@ -236,17 +242,17 @@ def _conf_errors(app):
 
     @app.errorhandler(307)
     def disable_error(error):
-        values = dict(error="307 Error", original_error=str(error), referrer=request.referrer)
+        values = dict(code=307, error="307 Error", original_error=str(error))
         return app.jsonify(values)
     
     @app.errorhandler(500)
     def error_500(error):
-        values = dict(error="Server Error", original_error=str(error), referrer=request.referrer)
+        values = dict(code=500, error="Server Error", original_error=str(error))
         return app.jsonify(values)
     
     @app.errorhandler(404)
     def not_found_error(error):
-        values = dict(error="404 Error", original_error=str(error), referrer=request.referrer)
+        values = dict(code=404, error="404 Error", original_error=str(error))
         return app.jsonify(values)
 
 def _conf_jsonify(app):
@@ -297,7 +303,6 @@ def _conf_periods(app):
         def convert(date_ordinal, frequency):
             return get_period_from_ordinal(date_ordinal, frequency)
         return dict(pandas_period=convert)
-    
 
 def create_app(config='widukind_api.settings.Prod'):
     
@@ -332,7 +337,7 @@ def create_app(config='widukind_api.settings.Prod'):
     _conf_converters(app)
     
     _conf_jsonify(app)
-    
+
     _conf_default_views(app)
     
     _conf_bp(app)

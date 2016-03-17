@@ -21,12 +21,6 @@
 		<td class="col-md-1">
 			<a target="_blank" href="{{ url_for("json.dataset", slug=dataset.slug) }}">JSON</a>
 		</td>	
-		<td class="col-md-1">
-			<a target="_blank" href="{{ url_for("eviews.values", provider=dataset.provider_name, dataset_code=dataset.dataset_code) }}">EVIEWS</a>
-			{#
-			<a target="_blank" href="{{ url_for("eviews.values", dataset=dataset.slug) }}">EVIEWS</a>
-			#}
-		</td>	
 	</tr>			
 	{% endfor %}
 {% endfor %}

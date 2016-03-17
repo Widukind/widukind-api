@@ -23,9 +23,9 @@
 	data:dataScope="DataStructure" 
 	xsi:type="widukind:DataSetType">
 {%- for series in objects %}
-<Series WIDUKIND_ID="{{ series.key }}" WIDUKIND_NAME="{{ series.name }}" {% if series.dimensions %}{% for k, v in series.dimensions.items() -%} {{k}}="{{v}}" {% endfor -%}{% endif %} {% if series.attributes %}{% for k, v in series.attributes.items() -%} {{k}}="{{v}}" {% endfor -%}{% endif %}>
+<Series WIDUKIND_ID="{{ series.key }}" WIDUKIND_NAME="{{ series.name }}" {% if series.dimensions %}{% for k, v in series.dimensions.items() -%} {{k|upper}}="{{v|upper}}" {% endfor -%}{% endif %} {% if series.attributes %}{% for k, v in series.attributes.items() -%} {{k|upper}}="{{v|upper}}" {% endfor -%}{% endif %}>
 {%- for obs in series["values"] %}
-<Obs TIME_PERIOD="{{ obs.period }}" OBS_VALUE="{{ obs.value }}" {% if obs.attributes -%}{% for k, v in obs.attributes.items() -%} {{k}}="{{v}}" {% endfor -%}{%- endif -%}/>
+<Obs TIME_PERIOD="{{ obs.period }}" OBS_VALUE="{{ obs.value }}" {% if obs.attributes -%}{% for k, v in obs.attributes.items() -%} {{k|upper}}="{{v}}" {% endfor -%}{%- endif -%}/>
 {%- endfor %}
 </Series>
 {%- endfor %}

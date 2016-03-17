@@ -17,49 +17,27 @@ def get_ordinal_from_period(date_str, freq=None):
 
 
 #@limiter.limit("100 per minute")
+#FIXME: header !!! @cache.memoize(360, make_name=func_cache_with_args)
 @bp.route('/<providerRef>/data/<flowRef>/all', defaults={"key": "all"})
 @bp.route('/<providerRef>/data/<flowRef>/<key>', endpoint="2-1-data-specific")
 @bp.route('/data/<flowRef>', defaults={"key": "all", "providerRef": "all"})
 @bp.route('/data/<flowRef>/all/<providerRef>', defaults={"key": "all"})
 @bp.route('/data/<flowRef>/<key>/<providerRef>')
-@cache.memoize(360, make_name=func_cache_with_args)
-def data_2_1_specific(flowRef, key=None, providerRef=None, version="all"):
-    """
+@bp.route('/data/<providerRef>/<flowRef>/<key>')
+def data_2_1(flowRef, key=None, providerRef=None, version="all"):
+    
+    if "application/vnd.sdmx.genericdata+xml;version=2.1" in request.headers.get("Accept", None):
+        tmpl_choice = '2.1/data-generic.xml'
+    else:
+        tmpl_choice = '2.1/data-specific.xml'
 
-    http "http://127.0.0.1:8081/api/v1/sdmx/data/IPCH-2015-FR-COICOP/A.07120./INSEE" Accept:application/xml
-    http "http://127.0.0.1:8081/api/v1/sdmx/data/IPCH-2015-FR-COICOP/A.07120./INSEE?startPeriod=2010&endPeriod=2014" Accept:application/xml
-    http://www.bdm.insee.fr/series/sdmx/data/IPI-2010-A21/M.B.BRUT?startPeriod=2014-01&endPeriod=2015-12
-
-    protocol://ws-entry-point/resource/flowRef/key/providerRef
-    TODO: flowRef: AGENCY_ID,FLOW_ID,VERSION
-    TODO: providerRef: AGENCY_ID,PROVIDER_ID
-    
-    firstNObservations 
-        Nombre maximum d'observation par series
-    lastNObservations 
-        Maximum number of observations counting back from the most recent observation
-    dimensionAtObservation 
-        Id fof the dimension attached at the observation level TIME_PERIOD
-    detail 
-        Desired amount of information to be returned. Values: full, dataonly, serieskeysonly, nodata full
-    includeHistory 
-        Whether to return vintages false
-    updatedAfter
-        2009-05-15T14%3A15%3A00%2B01%3A00
-    
-    Period format:
-        Daily/Business YYYY-MM-DD
-        Weekly YYYY-W[01-53]
-        Monthly YYYY-MM
-        Quarterly YYYY-Q[1-4]
-        Semi-annual YYYY-S[1-2]        # TODO: exclude
-        Annual YYYY    
-    """
-    
     limit = request.args.get('limit', default=0, type=int)
     
     start_period = request.args.get('startPeriod')
     end_period = request.args.get('endPeriod')
+    
+    if key:
+        key = key.lower()
     
     datas = queries.data_query(flowRef, 
                                provider_name=providerRef, 
@@ -69,49 +47,58 @@ def data_2_1_specific(flowRef, key=None, providerRef=None, version="all"):
                                limit=limit,
                                get_ordinal_func=get_ordinal_from_period)
 
-    #TODO: If-Modified-Since / Last-Modified
-    """
-    > request:
-        If-Modified-Since: Wed, 03 Feb 2016 11:28:46 GMT
-    > response: 
-        Status Code: 304 Not Modified
-    > request:
-        If-Modified-Since: Wed, 03 Feb 2016 11:35:46 GMT
-    > response: 
-        Status Code: 200 OK
-        Date: Wed, 03 Feb 2016 11:32:31 GMT
-        Expires: Wed, 03 Feb 2016 11:32:31 GMT
-        Last-Modified: Wed, 03 Feb 2016 11:28:46 GMT
-    """
-
-    tmpl = render_template('2.1/data-specific.xml', version="1.0", **datas)
+    tmpl = render_template(tmpl_choice, version="1.0", **datas)
     resp = make_response(tmpl)
     resp.headers["Content-Type"] = "application/xml"      
     return resp
-    from flask import stream_with_context
 
-    """    
-    db.series.count({dataset_code: "IPC-2015-COICOP", frequency: "A", "dimensions.PRODUIT": "07120"})
-    db.series.find({values: { $elemMatch: { ordinal: { $gte: 40, $lte: 45} } }, dataset_code: "IPC-2015-COICOP", frequency: "A", "dimensions.PRODUIT": "07120"})
-    db.series.find({values: { $elemMatch: { ordinal: { $gte: 40, $lte: 45} } }, dataset_code: "IPC-2015-COICOP", frequency: "A", "dimensions.PRODUIT": "07120"}, {values: { $elemMatch: { ordinal: { $gte: 40, $lte: 45} } }})
-    """
-    """
-    
-    count = docs.count()
-    print("COUNT[%s]" % count)
+"""
+http "http://127.0.0.1:8081/api/v1/sdmx/data/IPCH-2015-FR-COICOP/A.07120./INSEE" Accept:application/vnd.sdmx.genericdata+xml;version=2.1
+http "http://127.0.0.1:8081/api/v1/sdmx/data/IPCH-2015-FR-COICOP/A.07120./INSEE"
+http "http://127.0.0.1:8081/api/v1/sdmx/data/IPCH-2015-FR-COICOP/A.07120./INSEE?startPeriod=2010&endPeriod=2014" Accept:application/xml
+http://www.bdm.insee.fr/series/sdmx/data/IPI-2010-A21/M.B.BRUT?startPeriod=2014-01&endPeriod=2015-12
 
-    now = str(datetime.utcnow().isoformat())
-    context = {
-        "provider_name": doc["provider_name"],
-        "dataset_name": doc["name"],
-        "dataset_code": doc["dataset_code"],
-        "dataset_slug": doc["slug"],
-        "message_id": str(uuid.uuid4()),
-        "prepared_date": now,
-        "validFromDate": now,
-        "objects": docs,
-    }
-    """
+protocol://ws-entry-point/resource/flowRef/key/providerRef
+TODO: flowRef: AGENCY_ID,FLOW_ID,VERSION
+TODO: providerRef: AGENCY_ID,PROVIDER_ID
+
+firstNObservations 
+    Nombre maximum d'observation par series
+lastNObservations 
+    Maximum number of observations counting back from the most recent observation
+dimensionAtObservation 
+    Id fof the dimension attached at the observation level TIME_PERIOD
+detail 
+    Desired amount of information to be returned. Values: full, dataonly, serieskeysonly, nodata full
+includeHistory 
+    Whether to return vintages false
+updatedAfter
+    2009-05-15T14%3A15%3A00%2B01%3A00
+
+Period format:
+    Daily/Business YYYY-MM-DD
+    Weekly YYYY-W[01-53]
+    Monthly YYYY-MM
+    Quarterly YYYY-Q[1-4]
+    Semi-annual YYYY-S[1-2]        # TODO: exclude
+    Annual YYYY    
+
+
+#TODO: If-Modified-Since / Last-Modified
+
+> request:
+    If-Modified-Since: Wed, 03 Feb 2016 11:28:46 GMT
+> response: 
+    Status Code: 304 Not Modified
+> request:
+    If-Modified-Since: Wed, 03 Feb 2016 11:35:46 GMT
+> response: 
+    Status Code: 200 OK
+    Date: Wed, 03 Feb 2016 11:32:31 GMT
+    Expires: Wed, 03 Feb 2016 11:32:31 GMT
+    Last-Modified: Wed, 03 Feb 2016 11:28:46 GMT
+
+"""
 
 """
 itemID: only conceptscheme and agencyscheme
@@ -133,6 +120,7 @@ https://ws-entry-point/resource/agencyID/resourceID/version/itemID?queryStringPa
 DEFAULT: /datastructure/all/all/latest/all?detail=full&references=none
 
 """
+
 @bp.route('/datastructure/<agencyID>/<resourceID>', defaults={"version": "latest"}, endpoint="2-1-datastructure")
 @bp.route('/datastructure/<agencyID>/<resourceID>/<version>')
 @cache.memoize(360, make_name=func_cache_with_args)
@@ -248,8 +236,8 @@ def conceptscheme_2_1(agencyID, resourceID, version="latest", itemID=None):
     now = "%sZ" % str(datetime.utcnow().isoformat())
     context = {
         "dataset": doc,
-        "time_period_concept": "TIME_PERIOD" in doc.get("concepts"),
-        "obs_value_concept": "OBS_VALUE" in doc.get("concepts"),
+        "time_period_concept": "time_period" in doc.get("concepts"),
+        "obs_value_concept": "obs_value" in doc.get("concepts"),
         "load_all": references in ["children", "descendants", "all"],
         "message_id": str(uuid.uuid4()),
         "prepared_date": now,
@@ -299,8 +287,8 @@ def codelist_2_1(agencyID, resourceID, version="latest", itemID=None):
         "version": "1.0"
     }
     if is_concepts:
-        context["time_period_concept"] = "TIME_PERIOD" in doc.get("concepts")
-        context["obs_value_concept"] = "OBS_VALUE" in doc.get("concepts")
+        context["time_period_concept"] = "time_period" in doc.get("concepts")
+        context["obs_value_concept"] = "obs_value" in doc.get("concepts")
     
     tmpl = render_template('2.1/codelist.xml', **context)
     response = make_response(tmpl)

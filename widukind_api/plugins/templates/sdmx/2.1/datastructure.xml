@@ -22,13 +22,13 @@
         <str:DataStructureComponents>
           <str:DimensionList id="DimensionDescriptor" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DimensionDescriptor=WIDUKIND:{{dataset.dataset_code}}({{ version }}).DimensionDescriptor">
           	{%- for key in dataset.dimension_keys %}
-            <str:Dimension id="{{key}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.Dimension=WIDUKIND:{{dataset.dataset_code}}({{ version }}).{{ key }}" position="{{loop.index}}">
+            <str:Dimension id="{{key|upper}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.Dimension=WIDUKIND:{{dataset.dataset_code}}({{ version }}).{{ key|upper }}" position="{{loop.index}}">
               <str:ConceptIdentity>
-                <Ref id="{{key}}" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
+                <Ref id="{{key|upper}}" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
               </str:ConceptIdentity>
               <str:LocalRepresentation>
                 <str:Enumeration>
-                  <Ref id="{{key}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="codelist" class="Codelist"/>
+                  <Ref id="{{key|upper}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="codelist" class="Codelist"/>
                 </str:Enumeration>
               </str:LocalRepresentation>
             </str:Dimension>
@@ -51,15 +51,15 @@
           {% if dataset.attribute_keys %}
           <str:AttributeList id="AttributeDescriptor" urn="urn:sdmx:org.sdmx.infomodel.datastructure.AttributeDescriptor=WIDUKIND:{{dataset.dataset_code}}({{ version }}).AttributeDescriptor">
           	{%- for key in dataset.attribute_keys %}
-            <str:Attribute id="{{key}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DataAttribute=WIDUKIND:{{dataset.dataset_code}}({{ version }}).{{ key }}" assignmentStatus="Conditional">
+            <str:Attribute id="{{key|upper}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DataAttribute=WIDUKIND:{{dataset.dataset_code}}({{ version }}).{{ key|upper }}" assignmentStatus="Conditional">
               {#TODO: verif is in concepts ?#}
               <str:ConceptIdentity>
-                <Ref id="{{key}}" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
+                <Ref id="{{key|upper}}" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
               </str:ConceptIdentity>
               {% if key in dataset.codelists %}
               <str:LocalRepresentation>
                 <str:Enumeration>
-                  <Ref id="{{key}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="codelist" class="Codelist"/>
+                  <Ref id="{{key|upper}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="codelist" class="Codelist"/>
                 </str:Enumeration>
               </str:LocalRepresentation>
               {% else %}
