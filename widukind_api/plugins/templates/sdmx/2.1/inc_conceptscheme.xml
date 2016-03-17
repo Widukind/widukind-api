@@ -2,7 +2,7 @@
       <str:ConceptScheme id="{{dataset.provider_name}}_CONCEPTS" urn="urn:sdmx:org.sdmx.infomodel.conceptscheme.ConceptScheme=WIDUKIND:{{dataset.provider_name}}_CONCEPTS({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
         <com:Name xml:lang="en">{{dataset.provider_name}} concepts</com:Name>
         {%- for key, concept in dataset.concepts.items() %}
-        <str:Concept id="{{key}}" urn="urn:sdmx:org.sdmx.infomodel.conceptscheme.Concept=WIDUKIND:{{dataset.provider_name}}_CONCEPTS({{ version }}).{{ key }}">
+        <str:Concept id="{{key|upper}}" urn="urn:sdmx:org.sdmx.infomodel.conceptscheme.Concept=WIDUKIND:{{dataset.provider_name}}_CONCEPTS({{ version }}).{{ key|upper }}">
           <com:Name xml:lang="en">{{concept}}</com:Name>
         </str:Concept>
         {% endfor -%}
