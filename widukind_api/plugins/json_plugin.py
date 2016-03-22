@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import re
-from pprint import pprint
 from collections import OrderedDict
 
 from flask import current_app as app
-from flask import request, Blueprint, url_for, abort
+from flask import request, Blueprint, abort
 import arrow
 from bson import json_util
 from bson import ObjectId
-from json import dumps
 
 from widukind_api import queries
 
@@ -26,9 +23,6 @@ def json_convert(obj):
         return arrow.get(obj).for_json()
 
     return json_util.default(obj)
-
-#def json_response(value_str):
-#    return app.response_class(value_str, mimetype='application/json')
 
 def json_response(obj, meta={}):
     indent = None
@@ -282,8 +276,7 @@ def datasets_codelists(dataset):
 
 #---/series/<series>
 
-@bp.route('/series/<series>', endpoint="series-unit")
-def series_unit(series, only_values=False):
+def series_unit(series):
     query = {'slug': series}
     projection = {"_id": False}
     doc = queries.col_series().find_one(query, projection)
@@ -299,6 +292,19 @@ def series_unit(series, only_values=False):
         abort(404)
     
     return json_response(doc)
+
+def series_multi(series):
+    query = {'slug': {"$in": series.split("+")}}
+    projection = {"_id": False}
+    docs = queries.col_series().find(query, projection)
+    return json_response(docs)
+
+@bp.route('/series/<series>', endpoint="series-unit")
+def series_view(series):
+    if "+" in series:
+        return series_multi(series)
+    else:
+        return series_unit(series)
 
 """
 @bp.route('/series/<slug>/values', endpoint="series-values")
