@@ -16,6 +16,16 @@
 {% block scripts %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js" type="text/javascript"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"type="text/javascript"></script>
+
+{% block add_scripts %}
+{% endblock %}
+
+{% block last_scripts %}
+	{% if config.GOOGLE_ANALYTICS_ID %}
+	{{google.uanalytics(config['GOOGLE_ANALYTICS_ID'])}}
+	{% endif %}
+{% endblock %}
+
 {% endblock %}
 </body>
 </html>
