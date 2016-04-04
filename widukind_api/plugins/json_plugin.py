@@ -1,36 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 from collections import OrderedDict
 
-from flask import current_app as app
 from flask import request, Blueprint, abort
-import arrow
-from bson import json_util
-from bson import ObjectId
 
 from widukind_api import queries
+from widukind_common.flask_utils import json_tools
 
 bp = Blueprint('json', __name__)
-
-def json_convert(obj):
-
-    if isinstance(obj, ObjectId):
-        return str(obj)
-    
-    elif isinstance(obj, datetime):
-        #'2015-11-16T23:38:04.551214+00:00'
-        return arrow.get(obj).for_json()
-
-    return json_util.default(obj)
-
-def json_response(obj, meta={}):
-    indent = None
-    if request.is_xhr:
-        indent = 4
-    context = {"meta": meta, "data": obj}
-    value_str = json_util.dumps(context, default=json_convert, indent=indent)
-    return app.response_class(value_str, mimetype='application/json')
 
 #---/providers
 
@@ -38,15 +15,15 @@ def json_response(obj, meta={}):
 def providers_list():
     query = {"enable": True}
     projection = {"_id": False}
-    docs = queries.col_providers().find(query, projection)
-    return json_response(docs)
+    docs = [doc for doc in queries.col_providers().find(query, projection)]
+    return json_tools.json_response(docs)
 
 #---/providers/keys
 
 @bp.route('/providers/keys', endpoint="providers-list-keys")
 def providers_list_keys():
     docs = queries.col_providers().distinct("slug", filter={"enable": True})
-    return json_response(docs)
+    return json_tools.json_response(docs)
 
 """
 #---/categories/<provider>
@@ -57,7 +34,7 @@ def categories_view(provider):
     docs = queries.col_categories().find({"provider_name": provider_doc["name"],
                                           "enable": True},
                                          {"_id": False})
-    return json_response(docs)
+    return json_tools.json_response(docs)
 """    
 
 #---/providers/<provider>
@@ -65,7 +42,7 @@ def categories_view(provider):
 @bp.route('/providers/<provider>', endpoint="providers-unit")
 def providers_unit(provider):
     provider_doc = queries.get_provider(provider)
-    return json_response(provider_doc)
+    return json_tools.json_response(provider_doc)
 
 #---/providers/<provider>/datasets
 
@@ -77,8 +54,8 @@ def providers_datasets_list(provider):
                   "enable": False, "lock": False,
                   "concepts": False, "codelists": False}
     #docs = [doc for doc in queries.col_datasets().find(query, projection)]
-    docs = queries.col_datasets().find(query, projection)
-    return json_response(docs)
+    docs = [doc for doc in queries.col_datasets().find(query, projection)]
+    return json_tools.json_response(docs)
 
 #---/providers/<provider>/datasets/keys
 
@@ -87,7 +64,7 @@ def datasets_list_keys(provider):
     provider_doc = queries.get_provider(provider)
     query = {'provider_name': provider_doc["name"]}
     docs = queries.col_datasets().distinct("slug", filter=query)
-    return json_response(docs)
+    return json_tools.json_response(docs)
 
 #---/datasets/<dataset>/series
 
@@ -115,7 +92,9 @@ def datasets_series_list(dataset):
     if limit:
         docs= docs.limit(limit)
     
-    return json_response(docs)
+    _docs = [doc for doc in docs]
+    
+    return json_tools.json_response(_docs)
 
 """
 @bp.route('/category/<slug>', endpoint="category")
@@ -124,7 +103,7 @@ def category_view(slug):
                                           "enable": True})
     if not doc:
         abort(404)
-    return json_response(doc)
+    return json_tools.json_response(doc)
 """    
 
 #---/dataset/<dataset>
@@ -137,7 +116,7 @@ def dataset_unit(dataset):
     doc = queries.col_datasets().find_one(query, projection)
     if not doc:
         abort(404)
-    return json_response(doc)
+    return json_tools.json_response(doc)
 
 #---/dataset/<dataset>/frequencies
 
@@ -154,12 +133,15 @@ def dataset_unit_frequencies(dataset):
              "dataset_code": doc["dataset_code"]}
     
     docs = queries.col_series().distinct("frequency", filter=query)
-    return json_response(docs)
+    return json_tools.json_response(docs)
 
 #---/datasets/<dataset>/values
 
 @bp.route('/datasets/<dataset>/values', endpoint="datasets-series-list-values")
 def dataset_series_list_values(dataset):
+    """
+    http://127.0.0.1:8081/api/v1/json/datasets/insee-ipch-2015-fr-coicop/values?limit=10&tags=national+equipment&produit=00+09112
+    """
 
     query = {'enable': True, 'slug': dataset}
     projection = {"_id": False, "provider_name": True, "dataset_code": True }
@@ -173,6 +155,8 @@ def dataset_series_list_values(dataset):
         "_id": False, 
         "key": True, "slug": True, 
         "name": True, "frequency": True,
+        "start_date": True, "end_date": True,
+        "dimensions": True, "attributes": True,
         "values.value": True, "values.period": True,
     }
 
@@ -184,23 +168,8 @@ def dataset_series_list_values(dataset):
     if limit:
         docs = docs.limit(limit)
 
-    return json_response(docs)
-
-    """
-    indent = None
-    if request.is_xhr:
-        indent = 4
-
-    def generate():
-        yield "["
-        for i, row in enumerate(cursor):
-            yield json_util.dumps(row, default=json_convert, indent=indent)
-            if i < count:
-                yield ","
-        yield "]"
-
-    return app.response_class(generate(), mimetype='application/json')
-    """
+    _docs = [doc for doc in docs]
+    return json_tools.json_response_async(_docs)
                     
 
 """
@@ -223,7 +192,7 @@ def datasets_dimensions_list(dataset):
     dimensions = OrderedDict()
     for key in doc["dimension_keys"]:
         dimensions[key] = doc["codelists"].get(key, {})
-    return json_response(dimensions)
+    return json_tools.json_response(dimensions)
 
 #---/datasets/<dataset>/dimensions/keys
 
@@ -234,7 +203,7 @@ def datasets_dimensions_keys(dataset):
     doc = queries.col_datasets().find_one(query, projection)
     if not doc:
         abort(404)
-    return json_response(doc["dimension_keys"])
+    return json_tools.json_response(doc["dimension_keys"])
 
 #---/datasets/<dataset>/attributes
 
@@ -248,7 +217,7 @@ def datasets_attributes_list(dataset):
     attributes = OrderedDict()
     for key in doc.get("attribute_keys"):
         attributes[key] = doc["codelists"].get(key, {})
-    return json_response(attributes)
+    return json_tools.json_response(attributes)
 
 #---/datasets/<dataset>/attributes/keys
 
@@ -259,7 +228,7 @@ def datasets_attributes_keys(dataset):
     doc = queries.col_datasets().find_one(query, projection)
     if not doc:
         abort(404)
-    return json_response(doc.get("attribute_keys"))
+    return json_tools.json_response(doc.get("attribute_keys"))
 
 
 
@@ -272,7 +241,7 @@ def datasets_codelists(dataset):
     doc = queries.col_datasets().find_one(query, projection)
     if not doc:
         abort(404)
-    return json_response(doc["codelists"])
+    return json_tools.json_response(doc["codelists"])
 
 #---/series/<series>
 
@@ -291,13 +260,13 @@ def series_unit(series):
     if not dataset_doc:
         abort(404)
     
-    return json_response(doc)
+    return json_tools.json_response(doc)
 
 def series_multi(series):
     query = {'slug': {"$in": series.split("+")}}
     projection = {"_id": False}
-    docs = queries.col_series().find(query, projection)
-    return json_response(docs)
+    docs = [doc for doc in queries.col_series().find(query, projection)]
+    return json_tools.json_response(docs)
 
 @bp.route('/series/<series>', endpoint="series-unit")
 def series_view(series):
@@ -305,28 +274,4 @@ def series_view(series):
         return series_multi(series)
     else:
         return series_unit(series)
-
-"""
-@bp.route('/series/<slug>/values', endpoint="series-values")
-def series_values_view(slug):
-    query = {'slug': slug}
-    projection = {
-        "_id": False, "key": True, "slug": True,  
-        "values.value": True, "values.period": True,
-        "provider_name": True, 'dataset_code': True
-    }
-    doc = queries.col_series().find_one(query, projection)
-    if not doc:
-        abort(404)
-        
-    query = {'enable': True, 
-             "provider_name": doc["provider_name"], 
-             'dataset_code': doc["dataset_code"]}
-    projection = {"_id": False, "enable": True}
-    dataset_doc = queries.col_datasets().find_one(query, projection)
-    if not dataset_doc:
-        abort(404)
-        
-    return json_response(doc)
-"""
 
