@@ -185,6 +185,7 @@
 		        complete: function(jqXHR, textStatus){
 		        	output_field.html(jqXHR.responseText);
 		        	highlight_run();
+		        	$(button).spin(false);
 		        }
 		   	}).done(function (data, textStatus, xhr) {
 		   		//console.log(xhr.getAllResponseHeaders());

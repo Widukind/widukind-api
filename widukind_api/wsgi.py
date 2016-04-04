@@ -124,7 +124,7 @@ def _conf_logging(debug=False,
 
 def _conf_logging_mongo(app):
     #TODO: distinction entre app web et api dans collection
-    from widukind_api.mongo_logging_handler import MongoHandler
+    from widukind_common.mongo_logging_handler import MongoHandler
     handler = MongoHandler(db=app.widukind_db, collection=constants.COL_LOGS)
     handler.setLevel(logging.ERROR)
     app.logger.addHandler(handler)
@@ -168,10 +168,10 @@ def _conf_db(app):
     app.widukind_db = get_mongo_db(app.config.get("MONGODB_URL"))
 
 def _conf_session(app):
-    from widukind_api.mongo_session import PyMongoSessionInterface
+    from widukind_common.flask_utils.mongo_session import PyMongoSessionInterface
     app.session_interface = PyMongoSessionInterface(app.widukind_db,
                                                     collection=constants.COL_SESSION)
-    
+        
 def _conf_cache(app):
     """
     @cache.cached(timeout=50)
@@ -304,6 +304,11 @@ def _conf_periods(app):
             return get_period_from_ordinal(date_ordinal, frequency)
         return dict(pandas_period=convert)
 
+def _conf_cors(app):
+    from flask_cors import CORS
+    CORS(app, 
+         send_wildcard=True, methods=["GET"], resources={r"/api/v1/*": {"origins": "*"}})
+
 def create_app(config='widukind_api.settings.Prod'):
     
     env_config = config_from_env('WIDUKIND_API_SETTINGS', config)
@@ -351,6 +356,8 @@ def create_app(config='widukind_api.settings.Prod'):
     _conf_session(app)
     
     _conf_mail(app)
+    
+    _conf_cors(app)
     
     app.wsgi_app = ProxyFix(app.wsgi_app)
 

@@ -40,7 +40,7 @@ class Config(object):
         
     SENTRY_DSN = config('WIDUKIND_API_SENTRY_DSN', None)
     
-    SESSION_ENGINE_ENABLE = config('WIDUKIND_API_SESSION_ENGINE_ENABLE', False, cast=bool)
+    SESSION_ENGINE_ENABLE = config('WIDUKIND_API_SESSION_ENGINE_ENABLE', True, cast=bool)
 
     #---Flask-Compress
     COMPRESS_LEVEL = 6

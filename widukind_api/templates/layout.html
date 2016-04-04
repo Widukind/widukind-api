@@ -20,12 +20,6 @@
 {% block add_scripts %}
 {% endblock %}
 
-{% block last_scripts %}
-	{% if config.GOOGLE_ANALYTICS_ID %}
-	{{google.uanalytics(config['GOOGLE_ANALYTICS_ID'])}}
-	{% endif %}
-{% endblock %}
-
 {% endblock %}
 </body>
 </html>
