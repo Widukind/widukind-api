@@ -304,6 +304,11 @@ def _conf_periods(app):
             return get_period_from_ordinal(date_ordinal, frequency)
         return dict(pandas_period=convert)
 
+def _conf_cors(app):
+    from flask_cors import CORS
+    CORS(app, 
+         send_wildcard=True, methods=["GET"], resources={r"/api/v1/*": {"origins": "*"}})
+
 def create_app(config='widukind_api.settings.Prod'):
     
     env_config = config_from_env('WIDUKIND_API_SETTINGS', config)
@@ -351,6 +356,8 @@ def create_app(config='widukind_api.settings.Prod'):
     _conf_session(app)
     
     _conf_mail(app)
+    
+    _conf_cors(app)
     
     app.wsgi_app = ProxyFix(app.wsgi_app)
 
