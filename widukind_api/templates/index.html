@@ -43,7 +43,7 @@
 <a target="_blank" href="{{ url_for("json.dataset-values", slug="bis-pp-ls") }}">Dataset All Values BIS PP-LS</a>
 </li>
 <li>
-<a target="_blank" href="{{ url_for("json.dataset-values", slug="bis-pp-ls") }}?Reference area=FR">Dataset Values BIS PP-LS - Dimension {{ "Reference area=FR"|safe }}</a>
+<a target="_blank" href="{{ url_for("json.dataset-values", slug="bis-pp-ls") }}?reference-area=fr">Dataset Values BIS PP-LS - Dimension {{ "reference-area=fr"|safe }}</a>
 </li>
 </ul>
 
@@ -56,7 +56,7 @@
 <h3>Plugin Eviews:</h3>
 
 <ul>
-	<li><a target="_blank" href="{{ url_for("eviews.values-by-slug", slug="insee-ipch-2005-fr-coicop") }}?frequency=M&limit=100">Dataset INSEE IPCH-2005-FR-COICOP</a></li>
+	<li><a target="_blank" href="{{ url_for("eviews.values-by-slug", slug="insee-ipch-2015-fr-coicop") }}?frequency=M&limit=100">Dataset INSEE IPCH-2015-FR-COICOP</a></li>
 	<li><a target="_blank" href="{{ url_for("eviews.values-by-slug", slug="bis-pp-ls") }}">Dataset BIS PP-LS</a></li>
 </ul>
 
@@ -74,47 +74,40 @@
 		</a> 
 	</li>	
 	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-dataflow-dataset", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}">
-			Dataflow - INSEE - IPC-2015-COICOP
+		<a target="_blank" href="{{ url_for("sdmx.2-1-dataflow-dataset", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}">
+			Dataflow - INSEE - IPCH-2015-FR-COICOP
 		</a> 
 	</li>	
 	
 	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-datastructure", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}">
-			DataStructure - INSEE - IPC-2015-COICOP
+		<a target="_blank" href="{{ url_for("sdmx.2-1-datastructure", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}">
+			DataStructure - INSEE - IPCH-2015-FR-COICOP
 		</a> 
 	</li>
 	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-datastructure", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}?references=all">
-			DataStructure Complète - INSEE - IPC-2015-COICOP
+		<a target="_blank" href="{{ url_for("sdmx.2-1-datastructure", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}?references=all">
+			DataStructure Complète - INSEE - IPCH-2015-FR-COICOP
 		</a> 
 	</li>
 	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-data-specific", providerRef="INSEE", flowRef="IPC-2015-COICOP", key="A.011141.FE.INDICE") }}?startPeriod=2011&endPeriod=2014">
-			Data - INSEE - IPC-2015-COICOP - Series 001764374
+		<a target="_blank" href="{{ url_for("sdmx.2-1-data-specific", providerRef="INSEE", flowRef="IPCH-2015-FR-COICOP", key="A.00.INDICE") }}?startPeriod=2011&endPeriod=2014">
+			Data - INSEE - IPCH-2015-FR-COICOP - Series 001762489
 		</a> 
-		(<a target="_blank" href="{{config.WIDUKIND_WEB_URL}}/views/slug/series/insee-ipc-2015-coicop-001764374">Web</a>)
+		(<a target="_blank" href="{{config.WIDUKIND_WEB_URL}}/views/slug/series/insee-ipch-2015-fr-coicop-001762489">Web</a>)
 	</li>
 	
 	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-conceptscheme", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}">
-			ConceptScheme - INSEE - IPC-2015-COICOP
+		<a target="_blank" href="{{ url_for("sdmx.2-1-conceptscheme", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}">
+			ConceptScheme - INSEE - IPCH-2015-FR-COICOP
 		</a> 
 	</li>
 
 	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-codelist", agencyID="INSEE", resourceID="IPC-2015-COICOP") }}">
-			CodeList - INSEE - IPC-2015-COICOP
+		<a target="_blank" href="{{ url_for("sdmx.2-1-codelist", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}">
+			CodeList - INSEE - IPCH-2015-FR-COICOP
 		</a> 
 	</li>
 	
 </ul>
-
-<h3>Plugin R:</h3>
-
-<ul>
-	<li><a target="_blank" href="{{ url_for("r.series", slug="eurostat-namq-10-a10-e-q-ths-hw-total-swda-emp-dc-ea19") }}">Dataset Eurostat - namq_10_a10_e - Series Q.THS_HW.TOTAL.SWDA.EMP_DC.EA19</a></li>
-</ul>
-
 
 {% endblock %}
