@@ -14,7 +14,8 @@ bp = Blueprint('json', __name__)
 @bp.route('/providers', endpoint="providers-list")
 def providers_list():
     query = {"enable": True}
-    projection = {"_id": False}
+    projection = {"_id": False, "lock": False, "metadata": False, 
+                  "enable": False, "version": False}
     docs = [doc for doc in queries.col_providers().find(query, projection)]
     return json_tools.json_response(docs)
 
@@ -41,7 +42,9 @@ def categories_view(provider):
 
 @bp.route('/providers/<provider>', endpoint="providers-unit")
 def providers_unit(provider):
-    provider_doc = queries.get_provider(provider)
+    projection = {"_id": False, "lock": False, "metadata": False, 
+                  "enable": False, "version": False}
+    provider_doc = queries.get_provider(provider, projection=projection)
     return json_tools.json_response(provider_doc)
 
 #---/providers/<provider>/datasets
@@ -108,7 +111,8 @@ def category_view(slug):
 
 #---/dataset/<dataset>
 
-@bp.route('/dataset/<dataset>', endpoint="datasets-unit")
+@bp.route('/dataset/<dataset>')
+@bp.route('/datasets/<dataset>', endpoint="datasets-unit")
 def dataset_unit(dataset):
     query = {'enable': True, 'slug': dataset}
     projection = {"_id": False, 
@@ -120,7 +124,8 @@ def dataset_unit(dataset):
 
 #---/dataset/<dataset>/frequencies
 
-@bp.route('/dataset/<dataset>/frequencies', endpoint="datasets-unit-frequencies")
+@bp.route('/dataset/<dataset>/frequencies')
+@bp.route('/datasets/<dataset>/frequencies', endpoint="datasets-unit-frequencies")
 def dataset_unit_frequencies(dataset):
     query = {'enable': True, 'slug': dataset}
     projection = {"_id": False, 

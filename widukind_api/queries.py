@@ -14,7 +14,7 @@ from widukind_common.flask_utils.queries import *
 
 logger = logging.getLogger(__name__)
 
-def data_aggregate(query, start_period=None, end_period=None, limit=None):
+def data_aggregate(query, start_period=None, end_period=None, limit=None, db=None):
     
     start = time.time()
     
@@ -71,7 +71,7 @@ def data_aggregate(query, start_period=None, end_period=None, limit=None):
     pprint(pipeline)
     print("----------------------------------")
     
-    result = list(col_series().aggregate(pipeline, allowDiskUse=True))
+    result = list(col_series(db).aggregate(pipeline, allowDiskUse=True))
 
     end = time.time() - start
     msg = "sdmx-data-aggregate - %.3f"
@@ -81,14 +81,14 @@ def data_aggregate(query, start_period=None, end_period=None, limit=None):
 
 def data_query(dataset_code, provider_name=None, filters=None, 
                start_period=None, end_period=None,
-               limit=None, get_ordinal_func=None):
+               limit=None, get_ordinal_func=None, db=None):
 
     query_ds = {'enable': True, 'dataset_code': dataset_code}
     if provider_name:
         query_ds["provider_name"] = provider_name
     projection_ds = {"name": True, "dataset_code": True, "slug": True,
                      "provider_name": True, "dimension_keys": True}
-    dataset_doc = col_datasets().find_one(query_ds, projection_ds)
+    dataset_doc = col_datasets(db).find_one(query_ds, projection_ds)
     
     if not dataset_doc:
         abort(404)
@@ -126,15 +126,16 @@ def data_query(dataset_code, provider_name=None, filters=None,
             'values.period': True, 'values.value': True, 'values.ordinal': True, 
             'dimensions': True, 'attributes': True,
         }
-        cursor = col_series().find(query, projection)
+        cursor = col_series(db).find(query, projection)
         if limit:
             cursor = cursor.limit(limit)
         docs = list(cursor)
     else:
         cursor = data_aggregate(query, 
-                                        start_period=start_period, 
-                                        end_period=end_period, 
-                                        limit=limit)
+                                start_period=start_period, 
+                                end_period=end_period, 
+                                limit=limit,
+                                db=db)
         docs = []
         for doc in cursor:
             docs.append({

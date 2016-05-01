@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import os
+try:
+    import multiprocessing
+    CPU_COUNT = (multiprocessing.cpu_count() * 2) +1
+except:
+    CPU_COUNT = 1
 
 from decouple import config as env_config
 
@@ -18,15 +22,15 @@ proxy_allow_ips = env_config('WIDUKIND_API_PROXY_ALLOW_IPS', "127.0.0.1")
 
 forwarded_allow_ips = env_config('WIDUKIND_API_FORWARDED_ALLOW_IPS', "*")
 
-workers = env_config('WIDUKIND_API_WORKERS', 1, cast=int)
+workers = env_config('WIDUKIND_API_WORKERS', CPU_COUNT, cast=int)
 
 worker_class = env_config('WIDUKIND_API_WORKER_CLASS', 'gevent_wsgi')
 
-worker_connections = env_config('WIDUKIND_API_WORKER_CONNECTIONS', 5, cast=int)
+worker_connections = env_config('WIDUKIND_API_WORKER_CONNECTIONS', 200, cast=int)
 
 backlog = env_config('WIDUKIND_API_BACKLOG', 2048, cast=int)
 
-timeout = env_config('WIDUKIND_API_TIMEOUT', 30, cast=int)
+timeout = env_config('WIDUKIND_API_TIMEOUT', 360, cast=int)
 
 keepalive = env_config('WIDUKIND_API_KEEPALIVE', 2, cast=int)
 
