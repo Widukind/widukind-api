@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from werkzeug.contrib.fixers import ProxyFix
-from flask import Flask, request, abort, session, g, redirect, url_for, render_template, current_app
+from flask import Flask, request, abort, session, g, redirect, url_for, render_template, current_app, render_template_string
 from decouple import config as config_from_env
 
 from widukind_api import extensions
@@ -165,7 +165,7 @@ def _conf_sentry(app):
     
 def _conf_db(app):
     from widukind_common.utils import get_mongo_db
-    app.widukind_db = get_mongo_db(app.config.get("MONGODB_URL"))
+    app.widukind_db = get_mongo_db(app.config.get("MONGODB_URL"), connect=False)
 
 def _conf_session(app):
     from widukind_common.flask_utils.mongo_session import PyMongoSessionInterface
@@ -191,12 +191,19 @@ def _conf_default_views(app):
 
     @app.route("/", endpoint="home")
     def index():
-        return render_template("docs/json.html")
-        #return render_template("index.html")
+        return render_template("index.html")
 
     @app.route("/docs/json", endpoint="docs-json")
     def docs_json():
         return render_template("docs/json.html")
+
+    @app.route("/docs/html", endpoint="docs-html")
+    def docs_html():
+        return render_template("docs/html.html")
+
+    @app.route("/docs/sdmx", endpoint="docs-sdmx")
+    def docs_sdmx():
+        return render_template("docs/sdmx.html")
 
 def _conf_auth(app):
     extensions.auth.init_app(app)
@@ -218,17 +225,13 @@ def _conf_processors(app):
     
 def _conf_bp(app):
     from widukind_api.plugins import html_plugin
-    from widukind_api.plugins import eviews_plugin
     from widukind_api.plugins import json_plugin
-    from widukind_api.plugins import r_plugin
     from widukind_api.plugins import sdmx_plugin
-    #from widukind_api.plugins import rest_json
-    #app.register_blueprint(rest_json.bp, url_prefix='/api/v1/json2')    
     
     app.register_blueprint(html_plugin.bp, url_prefix='/api/v1/html')    
+    app.register_blueprint(html_plugin.eviews_bp, url_prefix='/api/v1/eviews')
+
     app.register_blueprint(json_plugin.bp, url_prefix='/api/v1/json')    
-    app.register_blueprint(eviews_plugin.bp, url_prefix='/api/v1/eviews')
-    app.register_blueprint(r_plugin.bp, url_prefix='/api/v1/r')
     app.register_blueprint(sdmx_plugin.bp, url_prefix='/api/v1/sdmx')    
     
 def _conf_errors(app):
@@ -242,18 +245,27 @@ def _conf_errors(app):
 
     @app.errorhandler(307)
     def disable_error(error):
+        is_json = request.args.get('json') or request.is_xhr
         values = dict(code=307, error="307 Error", original_error=str(error))
-        return app.jsonify(values)
+        if is_json:
+            return app.jsonify(values)
+        return render_template_string("<h3>{{error}}</h3><h4>{{ original_error}}</h4>", **values)
     
     @app.errorhandler(500)
     def error_500(error):
+        is_json = request.args.get('json') or request.is_xhr
         values = dict(code=500, error="Server Error", original_error=str(error))
-        return app.jsonify(values)
+        if is_json:
+            return app.jsonify(values)
+        return render_template_string("<h3>{{error}}</h3><h4>{{ original_error}}</h4>", **values)
     
     @app.errorhandler(404)
     def not_found_error(error):
-        values = dict(code=404, error="404 Error", original_error=str(error))
-        return app.jsonify(values)
+        is_json = request.args.get('json') or request.is_xhr
+        values = dict(code=404, error="404 Error", original_error=error.description)
+        if is_json:
+            return app.jsonify(values)
+        return render_template_string("<h3>{{error}}</h3><h4>{{ original_error}}</h4>", **values)
 
 def _conf_jsonify(app):
 
