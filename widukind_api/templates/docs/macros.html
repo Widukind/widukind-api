@@ -1,0 +1,294 @@
+
+{% macro buttons() %}
+<div class="form-inline">
+<button type="button" class="btn btn-default" id="btn-collapse-all"><i class="fa fa-minus-circle"></i> Collapse All</button>
+<button type="button" class="btn btn-default" id="btn-expand-all"><i class="fa fa-plus-circle"></i> Expand All</button>
+</div>
+{% endmacro %}
+
+{% macro _require(require=False) %}
+{%- if require %}<strong>true</strong>{% else %}false{% endif -%}
+{% endmacro %}
+
+{% macro parameter_title() %}
+<h2><small>Parameters:</small></h2>
+{% endmacro %}
+
+{% macro table(id, uri, help) %}
+<table class="table table-bordered table-hover">
+	<tbody>
+	<tr>
+		<td class="col-md-4 active">
+			<a data-toggle="collapse" href="#{{id}}" aria-expanded="false" aria-controls="{{id}}">
+			  {{uri}}
+			</a>	
+		</td>
+		<td class="col-md-8 info">
+			{{help}}
+		</td>
+	</tr>
+	</tbody>
+</table>
+{% endmacro %}
+
+{% macro collapsed(id, url) %}
+<div class="collapse" id="{{ id }}">
+	{% if caller %}
+	{{ parameter_title() }}
+	{{ caller() }}
+	{% endif %}
+	<div class="well">
+		<div class="input-group input-group-lg">
+			<input type="text" class="form-control" value="{{ url }}">
+		    <span class="input-group-btn"><button class="btn btn-primary ajax" type="button">Run</button></span>
+		    <span class="input-group-btn"><button class="btn btn-info clear" type="button">Clear</button></span>
+		</div>
+	</div>
+	<pre><code></code></pre>
+</div>	
+{% endmacro %}
+
+{% macro parameter_provider_slug(require=True) %}
+<div class="well well-sm">
+<h5><strong>provider:</strong></h5>
+<ul>
+	<li>Description: Provider slug value</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Examples: bis | insee | eurostat | ecb | oecd | bea | esri</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_dataset_slug(require=True) %}
+<div class="well well-sm">
+<h5><strong>dataset:</strong></h5>
+<ul>
+	<li>Description: Dataset slug value</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Examples: bis-pp-ls | insee-ipch-2015-fr-coicop </li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_series_slug(require=True) %}
+<div class="well well-sm">
+<h5><strong>series:</strong></h5>
+<ul>
+	<li>Description: Series slug value</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Examples: bis-pp-ls-q-au | insee-ipch-2015-fr-coicop-001759971 </li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_multi_series_slug(require=True) %}
+<div class="well well-sm">
+<h5><strong>series:</strong></h5>
+<ul>
+	<li>Description: Series slug values separate by +</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Examples: bis-pp-ls-q-au+insee-ipch-2015-fr-coicop-001759971 </li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_sdmx_agencyID(require=True) %}
+<div class="well well-sm">
+<h5><strong>agencyID:</strong></h5>
+<ul>
+	<li>Description: Agency ID</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Examples: BIS | INSEE | EUROSTAT</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_sdmx_providerRef(require=True) %}
+<div class="well well-sm">
+<h5><strong>providerRef:</strong></h5>
+<ul>
+	<li>Description: Provider Reference (same as Agency ID)</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Examples: BIS | INSEE | EUROSTAT</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_sdmx_resourceID(require=False) %}
+<div class="well well-sm">
+<h5><strong>resourceID:</strong></h5>
+<ul>
+	<li>Description: Resource ID (dataset code)</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Examples : PP-LS | IPCH-2015-FR-COICOP</li>
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_sdmx_flowRef(require=True) %}
+<div class="well well-sm">
+<h5><strong>flowRef:</strong></h5>
+<ul>
+	<li>Description: Flow reference (same as Resource ID / dataset code)</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Examples : PP-LS | IPCH-2015-FR-COICOP</li>
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_sdmx_key(require=False) %}
+<div class="well well-sm">
+<h5><strong>key:</strong></h5>
+<ul>
+	<li>Description: Filter key for SDMX datas</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Examples : a.07120.indice | M.B.BRUT | M+A.B.BRUT</li>
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_startPeriod(require=False) %}
+<div class="well well-sm">
+<h5><strong>startPeriod:</strong></h5>
+<ul>
+	<li>Description: Start from Period</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Example: ?startPeriod=2012</li>	
+	<li>Example: ?startPeriod=2012Q2</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_endPeriod(require=False) %}
+<div class="well well-sm">
+<h5><strong>endPeriod:</strong></h5>
+<ul>
+	<li>Description: End to Period</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Example: ?endPeriod=2014</li>	
+	<li>Example: ?endPeriod=2014Q2</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_references(require=False) %}
+<h4>references</h4>
+<div class="well well-sm">
+<ul>
+	<li>Description: Extended datastructure (resolve dataflows, codelists, conceptschemes)</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Default: none</li>	
+	<li>Example: ?references=all</li>
+	<li>Available values: children, descendants, all, none</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_limit(require=False, default_value=100, max_value=1000) %}
+<div class="well well-sm">
+<h5><strong>limit:</strong></h5>
+<ul>
+	<li>Description: The maximum number of results to return</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: int</li>	
+	<li>Default: {{ default_value }}</li>	
+	<li>Maximum value: {{ max_value }}</li>	
+	<li>Example: ?limit=1000</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_page(require=False) %}
+<div class="well well-sm">
+<h5><strong>page:</strong></h5>
+<ul>
+	<li>Description: Page number</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: int</li>	
+	<li>Default: 1</li>	
+	<li>Example: ?page=1</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_per_page(require=False, default_value=20, max_value=100) %}
+<div class="well well-sm">
+<h5><strong>per_page:</strong></h5>
+<ul>
+	<li>Description: Results by page</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: int</li>	
+	<li>Default: {{ default_value }}</li>	
+	<li>Maximum value: {{ max_value }}</li>	
+	<li>Example: ?per_page=200</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_frequency(require=False) %}
+<div class="well well-sm">
+<h5><strong>frequency:</strong></h5>
+<ul>
+	<li>Description: Frequency filter</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: str</li>	
+	<li>Default: None</li>	
+	<li>Example: ?frequency=Q</li>	
+	<li>Available values (depend dataset): A, Q, M, W</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_dimensions_or_attributes(require=False) %}
+<div class="well well-sm">
+<h5><strong>&lt;dimension_or_attribute&gt;:</strong></h5>
+<ul>
+	<li>Description: Dimension or attribute filter</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: string</li>	
+	<li>Default: None</li>
+	<li>Example: ?reference-area=FR (only series with dimension reference-area=FR)</li>	
+	<li>Example: ?reference-area=!FR (exclude series with dimension reference-area=FR)</li>	
+	<li>Example: ?reference-area=de+au (select DE+AU)</li>	
+	<li>Comment: No case</li>
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_tags(require=False) %}
+<div class="well well-sm">
+<h5><strong>tags:</strong></h5>
+<ul>
+	<li>Description: Tags filter</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: str</li>	
+	<li>Default: None</li>	
+	<li>Example: ?tags=france</li>	
+	<li>Example: ?tags=france+australia</li>	
+	<li>Example: ?tags=fr+au</li>	
+	<li>Comment: No case</li>	
+</ul>
+</div>
+{% endmacro %}
+
+{% macro parameter_decimal_separator(require=False) %}
+<div class="well well-sm">
+<h5><strong>separator:</strong></h5>
+<ul>
+	<li>Description: Decimal separator</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: str</li>	
+	<li>Default: dot</li>	
+	<li>Example: ?separator=comma</li>	
+</ul>
+</div>
+{% endmacro %}
+

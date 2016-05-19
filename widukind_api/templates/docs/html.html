@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+{% import "docs/macros.html" as param %}
+
+{% block css %}
+	{{super()}}
+	{% include "docs/common_css.html" with context %}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h3><a href="{{ url_for("home") }}">Home</a></h3>
+  <h1>HTML Rest API for Widukind</h1>
+</div>
+
+<div class="well well-sm">
+	<ul>
+		<li>Add <strong>/api/v1/html</strong> before all uris. Example: for <strong>/providers</strong> use <strong>/api/v1/html/providers</strong></li>
+		<li>Use filters when availables</li>
+	</ul>
+</div>
+
+{{ param.buttons() }}
+
+<h2>Providers:</h2>
+
+{{ param.table("providers-list", "/providers", "All Providers list") }}
+{{ param.collapsed("providers-list", url_for("html.providers-list", _external=True)) }}
+
+{#
+
+{{ param.table("providers-list-keys", "/providers/keys", "All Providers keys") }}
+{{ param.collapsed("providers-list-keys", url_for("json.providers-list-keys", _external=True)) }}
+
+{{ param.table("providers-unit", "/providers/<provider>", "One Provider") }}
+{{ param.collapsed("providers-unit", url_for("json.providers-unit", provider="bis", _external=True)) }}
+
+{{ param.table("providers-datasets-list-keys", "/providers/<provider>/datasets/keys", "All datasets keys for this provider") }}
+{{ param.collapsed("providers-datasets-list-keys", url_for("json.providers-datasets-list-keys", provider="bis", _external=True)) }}
+
+{{ param.table("providers-datasets-list", "/providers/<provider>/datasets", "All datasets list for this provider") }}
+{{ param.collapsed("providers-datasets-list", url_for("json.providers-datasets-list", provider="bis", _external=True)) }}
+#}
+
+<h2>Datasets:</h2>
+
+{#
+{{ param.table("datasets-unit", "/datasets/<dataset>", "One Dataset") }}
+{{ param.collapsed("datasets-unit", url_for("json.datasets-unit", dataset="bis-pp-ls", _external=True)) }}
+
+{{ param.table("datasets-series-list", "/datasets/<dataset>/series", "Series list (exclude values)") }}
+{% call param.collapsed("datasets-series-list", url_for("json.datasets-series-list", dataset="bis-pp-ls", _external=True)+"?reference-area=fr+au") %}
+{% include "docs/shared-parameters.html" %}
+{% endcall %}
+#}
+
+{{ param.table("datasets-series-list-values", "/datasets/<dataset>/<frequency>/values", "Series list values") }}
+{% call param.collapsed("datasets-series-list-values", url_for("html.datasets-series-list-values", dataset="bis-pp-ls", frequency="Q", _external=True)+"?reference-area=fr+au") %}
+
+{{ param.parameter_frequency(require=True) }}
+
+{{ param.parameter_dimensions_or_attributes() }}
+
+{{ param.parameter_tags() }}
+
+{{ param.parameter_limit() }}
+
+{{ param.parameter_decimal_separator() }}
+
+{% endcall %}
+
+{#
+{{ param.table("datasets-unit-frequencies", "/datasets/<dataset>/frequencies", "Frequencies availables") }}
+{{ param.collapsed("datasets-unit-frequencies", url_for("json.datasets-unit-frequencies", dataset="bis-pp-ls", _external=True)) }}
+
+{{ param.table("datasets-dimensions-keys", "/datasets/<dataset>/dimensions/keys", "Dimension keys for this dataset") }}
+{{ param.collapsed("datasets-dimensions-keys", url_for("json.datasets-dimensions-keys", dataset="bis-pp-ls", _external=True)) }}
+
+{{ param.table("datasets-dimensions-list", "/datasets/<dataset>/dimensions", "Dimension list for this dataset") }}
+{{ param.collapsed("datasets-dimensions-list", url_for("json.datasets-dimensions-list", dataset="bis-pp-ls", _external=True)) }}
+
+{{ param.table("datasets-attributes-keys", "/datasets/<dataset>/attributes/keys", "Attribute keys for this dataset") }}
+{{ param.collapsed("datasets-attributes-keys", url_for("json.datasets-attributes-keys", dataset="insee-ipch-2015-fr-coicop", _external=True)) }}
+
+{{ param.table("datasets-attributes-list", "/datasets/<dataset>/attributes", "Attribute list for this dataset") }}
+{{ param.collapsed("datasets-attributes-list", url_for("json.datasets-attributes-list", dataset="insee-ipch-2015-fr-coicop", _external=True)) }}
+
+{{ param.table("datasets-codelists", "/datasets/<dataset>/codelists", "Codelist (dimensions and attributes) for this dataset") }}
+{{ param.collapsed("datasets-codelists", url_for("json.datasets-codelists", dataset="insee-ipch-2015-fr-coicop", _external=True)) }}
+#}
+
+{#
+<h2>Series:</h2>
+
+{{ param.table("series-unit", "/series/<series>", "One series") }}
+{{ param.collapsed("series-unit", url_for("json.series-unit", series="bis-pp-ls-q-au", _external=True)) }}
+
+{{ param.table("series-multi", "/series/<series>+<series>+<series>", "Multiple series") }}
+{{ param.collapsed("series-multi", url_for("json.series-unit", series="bis-pp-ls-q-au+bis-pp-ls-q-fr", _external=True)) }}
+#}
+
+{% endblock content %}
+
+{% block add_scripts %}
+	{{super()}}
+	{% include "docs/common_scripts.html" with context %}
+{% endblock %}
