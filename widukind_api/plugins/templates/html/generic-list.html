@@ -1,0 +1,16 @@
+<table>
+	<thead>
+		{%- for field in fields %}
+		<th>{{field.1}}</th>
+		{%- endfor %}
+	</thead>
+	<tbody>
+	{%- for doc in docs %}
+	<tr>
+		{%- for field in fields %}
+			<td>{{doc[field.0]|default("&nbsp;")}}</td>
+		{%- endfor %}
+	</tr>
+	{%- endfor %}
+	</tbody>
+</table>

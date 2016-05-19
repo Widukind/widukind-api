@@ -11,43 +11,40 @@
     <mes:Receiver id="unknown"/>
   </mes:Header>
   <mes:Structures>
-    {% if load_all %}
-    {% include "2.1/inc_dataflow.xml" with context %}
-    {% include "2.1/inc_codelist.xml" with context %}
-    {% include "2.1/inc_conceptscheme.xml" with context %}
-    {% endif %}    
-    <str:DataStructures>
-      <str:DataStructure id="{{dataset.dataset_code}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=WIDUKIND:{{dataset.dataset_code}}({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
-        <com:Name xml:lang="en">{{dataset.name}}</com:Name>
-        <str:DataStructureComponents>
-          <str:DimensionList id="DimensionDescriptor" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DimensionDescriptor=WIDUKIND:{{dataset.dataset_code}}({{ version }}).DimensionDescriptor">
-          	{%- for key in dataset.dimension_keys %}
-            <str:Dimension id="{{key|upper}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.Dimension=WIDUKIND:{{dataset.dataset_code}}({{ version }}).{{ key|upper }}" position="{{loop.index}}">
-              <str:ConceptIdentity>
-                <Ref id="{{key|upper}}" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
-              </str:ConceptIdentity>
-              <str:LocalRepresentation>
-                <str:Enumeration>
-                  <Ref id="{{key|upper}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="codelist" class="Codelist"/>
-                </str:Enumeration>
-              </str:LocalRepresentation>
-            </str:Dimension>
-            {% endfor -%}
-            <str:TimeDimension id="TIME_PERIOD" urn="urn:sdmx:org.sdmx.infomodel.datastructure.TimeDimension=WIDUKIND:{{dataset.dataset_code}}({{ version }}).TIME_PERIOD" position="{{dataset.dimension_keys|length+1}}">
-              <str:ConceptIdentity>
-                <Ref id="TIME_PERIOD" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
-              </str:ConceptIdentity>
-              <str:LocalRepresentation>
-                <str:TextFormat textType="ObservationalTimePeriod"/>
-              </str:LocalRepresentation>
-            </str:TimeDimension>
-          </str:DimensionList>
-          <!-- 
-          {#
-          TODO: <str:Attribute id="OBS_CONF" assignmentStatus="Conditional">
-          #}
-           -->
-          
+	{%- if load_all %}
+	{% include "2.1/inc_dataflow.xml" with context %}
+	{% include "2.1/inc_codelist.xml" with context %}
+	{% include "2.1/inc_conceptscheme.xml" with context %}
+	{%- endif %}    
+	<str:DataStructures>
+		<str:DataStructure id="{{dataset.dataset_code}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=WIDUKIND:{{dataset.dataset_code}}({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
+			<com:Name xml:lang="en">{{dataset.name}}</com:Name>
+			<str:DataStructureComponents>
+				<str:DimensionList id="DimensionDescriptor" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DimensionDescriptor=WIDUKIND:{{dataset.dataset_code}}({{ version }}).DimensionDescriptor">
+          			{%- for key in dataset.dimension_keys %}
+					<str:Dimension id="{{key|upper}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.Dimension=WIDUKIND:{{dataset.dataset_code}}({{ version }}).{{ key|upper }}" position="{{loop.index}}">
+						<str:ConceptIdentity>
+							<Ref id="{{key|upper}}" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
+						</str:ConceptIdentity>
+						<str:LocalRepresentation>
+							<str:Enumeration>
+								<Ref id="{{key|upper}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="codelist" class="Codelist"/>
+							</str:Enumeration>
+						</str:LocalRepresentation>
+					</str:Dimension>
+					{% endfor -%}
+					<str:TimeDimension id="TIME_PERIOD" urn="urn:sdmx:org.sdmx.infomodel.datastructure.TimeDimension=WIDUKIND:{{dataset.dataset_code}}({{ version }}).TIME_PERIOD" position="{{dataset.dimension_keys|length+1}}">
+						<str:ConceptIdentity>
+							<Ref id="TIME_PERIOD" maintainableParentID="{{dataset.provider_name}}_CONCEPTS" maintainableParentVersion="{{ version }}" agencyID="{{ dataset.provider_name }}" package="conceptscheme" class="Concept"/>
+						</str:ConceptIdentity>
+						<str:LocalRepresentation>
+							<str:TextFormat textType="ObservationalTimePeriod"/>
+						</str:LocalRepresentation>
+					</str:TimeDimension>
+				</str:DimensionList>
+				{#
+				TODO: <str:Attribute id="OBS_CONF" assignmentStatus="Conditional">
+				#}
           {% if dataset.attribute_keys %}
           <str:AttributeList id="AttributeDescriptor" urn="urn:sdmx:org.sdmx.infomodel.datastructure.AttributeDescriptor=WIDUKIND:{{dataset.dataset_code}}({{ version }}).AttributeDescriptor">
           	{%- for key in dataset.attribute_keys %}

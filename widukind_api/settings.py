@@ -23,6 +23,8 @@ class Config(object):
     
     CACHE_REDIS_URL = config('WIDUKIND_REDIS_URL', 'redis://localhost:6379/0')
     
+    DISABLE_CACHE = False #for debug views
+    
     if ENABLE_CACHE and ENABLE_REDIS:
         CACHE_TYPE = "redis"
         CACHE_REDIS_URL = config('WIDUKIND_REDIS_URL', 'redis://localhost:6379/0')

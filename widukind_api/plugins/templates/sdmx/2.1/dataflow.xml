@@ -11,6 +11,6 @@
     <mes:Receiver id="unknown"/>
   </mes:Header>
   <mes:Structures>
-  	{% include "2.1/inc_dataflow.xml" with context %}
+	{% include "2.1/inc_dataflow.xml" with context %}
   </mes:Structures>
 </mes:Structure>

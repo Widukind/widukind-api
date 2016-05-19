@@ -2,112 +2,23 @@
 
 {% block content %}
 
-<h3>Liens HTML</h3>
-<ul>
-	<li><a target="_blank" href="{{ url_for("html.providers") }}">Providers</a></li>
-{#
-	<li><a target="_blank" href="{{ url_for("html.datasets") }}">Datasets</a></li>
-#}
-</ul>
-
-<h3>JSON:</h3>
-
-{#/api/v1/category/&lt;slug&gt; (<a target="_blank" href="{{ url_for("json.category", slug="bis") }}">Categories BIS</a>)#}
-
-<ul>
-<li>
-<a target="_blank" href="{{ url_for("json.providers") }}">All Providers</a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.categories", provider="bis") }}">Categories BIS</a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.datasets", provider="bis") }}">Datasets BIS</a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.provider", slug="bis") }}">Provider BIS</a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.dataset", slug="bis-pp-ls") }}">Dataset BIS PP-LS</a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.series-list", dataset="bis-pp-ls") }}">Dataset BIS PP-LS - All Series </a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.series", slug="bis-pp-ls-q-au") }}">Dataset BIS PP-LS - Series Q:AU - (Quarterly - Australia)</a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.series-values", slug="bis-pp-ls-q-au") }}">Series Values BIS PP-LS - Q:AU - (Quarterly - Australia)</a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.dataset-values", slug="bis-pp-ls") }}">Dataset All Values BIS PP-LS</a>
-</li>
-<li>
-<a target="_blank" href="{{ url_for("json.dataset-values", slug="bis-pp-ls") }}?reference-area=fr">Dataset Values BIS PP-LS - Dimension {{ "reference-area=fr"|safe }}</a>
-</li>
-</ul>
-
-<h3>Tools:</h3>
-
-<ul>
-	<li><a target="_blank" href="{{ url_for("json.dataset-dimensions-key", slug="bis-pp-ls") }}">Dataset BIS PP-LS - Dimensions Key</a></li>
-</ul>
-
-<h3>Plugin Eviews:</h3>
-
-<ul>
-	<li><a target="_blank" href="{{ url_for("eviews.values-by-slug", slug="insee-ipch-2015-fr-coicop") }}?frequency=M&limit=100">Dataset INSEE IPCH-2015-FR-COICOP</a></li>
-	<li><a target="_blank" href="{{ url_for("eviews.values-by-slug", slug="bis-pp-ls") }}">Dataset BIS PP-LS</a></li>
-</ul>
-
-<h3>SDMX 2.1 XML</h3>
-
-<ul>
-	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-dataflow") }}">
-			Dataflow - All Providers
-		</a> 
-	</li>		
-	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-dataflow-agency", agencyID="INSEE") }}">
-			Dataflow - INSEE
-		</a> 
-	</li>	
-	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-dataflow-dataset", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}">
-			Dataflow - INSEE - IPCH-2015-FR-COICOP
-		</a> 
-	</li>	
-	
-	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-datastructure", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}">
-			DataStructure - INSEE - IPCH-2015-FR-COICOP
-		</a> 
-	</li>
-	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-datastructure", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}?references=all">
-			DataStructure Complète - INSEE - IPCH-2015-FR-COICOP
-		</a> 
-	</li>
-	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-data-specific", providerRef="INSEE", flowRef="IPCH-2015-FR-COICOP", key="A.00.INDICE") }}?startPeriod=2011&endPeriod=2014">
-			Data - INSEE - IPCH-2015-FR-COICOP - Series 001762489
-		</a> 
-		(<a target="_blank" href="{{config.WIDUKIND_WEB_URL}}/views/slug/series/insee-ipch-2015-fr-coicop-001762489">Web</a>)
-	</li>
-	
-	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-conceptscheme", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}">
-			ConceptScheme - INSEE - IPCH-2015-FR-COICOP
-		</a> 
-	</li>
-
-	<li>
-		<a target="_blank" href="{{ url_for("sdmx.2-1-codelist", agencyID="INSEE", resourceID="IPCH-2015-FR-COICOP") }}">
-			CodeList - INSEE - IPCH-2015-FR-COICOP
-		</a> 
-	</li>
-	
-</ul>
+<div class="page-header">
+  <h1>API for <a href="https://github.com/Widukind">Widukind</a></h1>
+  
+  <h2>HTML Api - <a class="small" href="{{ url_for("docs-html") }}">{{ url_for("docs-html", _external=True) }}</a></h2>
+  <h4>Tested with Excel and Eviews </h4>
+  
+  <h2>JSON Api - <a class="small" href="{{ url_for("docs-json") }}">{{ url_for("docs-json", _external=True) }}</a></h2>
+  <h4>Used by <a href="https://github.com/Widukind/widukind.m">Matlab plugin</a></h4>
+  
+  <h2>SDMX Api - <a class="small" href="{{ url_for("docs-sdmx") }}">{{ url_for("docs-sdmx", _external=True) }}</a></h2>
+  <h4>
+  Used by <a href="https://github.com/Widukind/widukind.R.sdmx">R</a>
+  and 
+  <a href="https://github.com/Widukind/widukind.R.sdmx">Python</a>
+  plugins  
+  </h4>
+  
+</div>
 
 {% endblock %}

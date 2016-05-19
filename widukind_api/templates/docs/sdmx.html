@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+{% import "docs/macros.html" as param %}
+
+{% block css %}
+	{{super()}}
+	{% include "docs/common_css.html" with context %}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h3><a href="{{ url_for("home") }}">Home</a></h3>
+  <h1>SDMX XML 2.1 for Widukind</h1>
+</div>
+
+<div class="well well-sm">
+	<ul>
+		<li>Add <strong>/api/v1/sdmx</strong> before all uris. Example: <strong>/api/v1/sdmx/providers</strong></li>
+		<li>Use filters when availables</li>
+	</ul>
+</div>
+
+{{ param.buttons() }}
+
+<h3>Data:</h3>
+
+{{ param.table("2-1-data-specific", "/<providerRef>/data/<flowRef>/<key>", "Data") }}
+{% call param.collapsed("2-1-data-specific", url_for("sdmx.2-1-data-specific", providerRef="INSEE", flowRef="IPCH-2015-FR-COICOP", key="a.07120.indice", _external=True)) %}
+	{{ param.parameter_sdmx_providerRef() }}
+	{{ param.parameter_sdmx_flowRef() }}
+	{{ param.parameter_sdmx_key() }}
+	{{ param.parameter_startPeriod() }}
+	{{ param.parameter_endPeriod() }}
+	{{ param.parameter_limit(default_value=200, max_value=1000) }}
+	
+<div class="well well-sm">
+<h5><strong>Header Accept:</strong></h5>
+<ul>
+	<li>Description: SDMX format (genericdata or specificdata)</li>	
+	<li>Default: application/vnd.sdmx.structurespecificdata+xml;version=2.1</li>
+</ul>
+<p>
+For <strong>genericdata</strong>, use <strong>application/vnd.sdmx.genericdata+xml;version=2.1</strong> in Accept header.
+</p>
+</div>
+	
+		
+{% endcall %}
+
+<h3>Structure (dsd):</h3>
+
+{{ param.table("2-1-datastructure", "/datastructure/<agencyID>/<resourceID>", "Datastructure") }}
+{% call param.collapsed("2-1-datastructure", url_for("sdmx.2-1-datastructure", agencyID="BIS", resourceID="PP-LS", _external=True)) %}
+	{{ param.parameter_sdmx_agencyID() }}
+	{{ param.parameter_sdmx_resourceID() }}
+	{{ param.parameter_references() }}
+{% endcall %}
+
+
+<h3>Dataflow:</h3>
+{{ param.table("2-1-dataflow", "dataflow", "All Dataflows (datasets)") }}
+{{ param.collapsed("2-1-dataflow", url_for("sdmx.2-1-dataflow", _external=True)) }}
+
+{{ param.table("2-1-dataflow-agency", "/dataflow/<agencyID>", "Dataflows for agency") }}
+{% call param.collapsed("2-1-dataflow-agency", url_for("sdmx.2-1-dataflow-agency", agencyID="BIS", _external=True)) %}
+	{{ param.parameter_sdmx_agencyID() }}
+{% endcall %}
+
+{{ param.table("2-1-dataflow-dataset", "/dataflow/<agencyID>/<resourceID>", "One Dataflow") }}
+{% call param.collapsed("2-1-dataflow-dataset", url_for("sdmx.2-1-dataflow-dataset", agencyID="BIS", resourceID="PP-LS", _external=True)) %}
+	{{ param.parameter_sdmx_agencyID() }}
+	{{ param.parameter_sdmx_resourceID() }}
+{% endcall %}
+
+{% endblock content %}
+
+{% block add_scripts %}
+	{{super()}}
+	{% include "docs/common_scripts.html" with context %}
+{% endblock %}

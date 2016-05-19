@@ -10,11 +10,13 @@ from widukind_api import queries
 from widukind_api.extensions import cache, limiter
 from widukind_api.flask_utils import func_cache_with_args
 
-bp = Blueprint('sdmx', __name__, template_folder='templates/sdmx')
+bp = Blueprint('sdmx', __name__, template_folder='templates')
 
 def get_ordinal_from_period(date_str, freq=None):
     return current_app.get_ordinal_from_period(date_str, freq)
 
+def optional_cache():
+    return current_app.config.get("DISABLE_CACHE") is True
 
 #@limiter.limit("100 per minute")
 #FIXME: header !!! @cache.memoize(360, make_name=func_cache_with_args)
@@ -27,11 +29,13 @@ def get_ordinal_from_period(date_str, freq=None):
 def data_2_1(flowRef, key=None, providerRef=None, version="all"):
     
     if "application/vnd.sdmx.genericdata+xml;version=2.1" in request.headers.get("Accept", None):
-        tmpl_choice = '2.1/data-generic.xml'
+        tmpl_choice = 'sdmx/2.1/data-generic.xml'
     else:
-        tmpl_choice = '2.1/data-specific.xml'
+        tmpl_choice = 'sdmx/2.1/data-specific.xml'
 
-    limit = request.args.get('limit', default=0, type=int)
+    limit = request.args.get('limit', default=200, type=int)
+    if limit > 1000:
+        limit = 1000
     
     start_period = request.args.get('startPeriod')
     end_period = request.args.get('endPeriod')
@@ -123,7 +127,7 @@ DEFAULT: /datastructure/all/all/latest/all?detail=full&references=none
 
 @bp.route('/datastructure/<agencyID>/<resourceID>', defaults={"version": "latest"}, endpoint="2-1-datastructure")
 @bp.route('/datastructure/<agencyID>/<resourceID>/<version>')
-@cache.memoize(360, make_name=func_cache_with_args)
+@cache.memoize(360, make_name=func_cache_with_args, unless=optional_cache)
 def dsd_2_1(agencyID, resourceID, version="latest"):
     """
     http://127.0.0.1:8081/api/v1/sdmx/datastructure/INSEE/IPCH-2015-FR-COICOP
@@ -164,7 +168,7 @@ def dsd_2_1(agencyID, resourceID, version="latest"):
         "version": "1.0"
     }
     
-    tmpl = render_template('2.1/datastructure.xml', **context)
+    tmpl = render_template('sdmx/2.1/datastructure.xml', **context)
     response = make_response(tmpl)
     response.headers["Content-Type"] = "application/xml"      
     return response
@@ -173,11 +177,9 @@ def dsd_2_1(agencyID, resourceID, version="latest"):
 @bp.route('/dataflow/<agencyID>', endpoint="2-1-dataflow-agency")
 @bp.route('/dataflow/<agencyID>/<resourceID>', defaults={"version": "latest"}, endpoint="2-1-dataflow-dataset")
 @bp.route('/dataflow/<agencyID>/<resourceID>/<version>')
-@cache.memoize(360, make_name=func_cache_with_args)
+@cache.memoize(360, make_name=func_cache_with_args, unless=optional_cache)
 def dataflow_2_1(agencyID=None, resourceID=None, version="latest"):
     """
-    http://127.0.0.1:8081/api/v1/sdmx/dataflow/INSEE/IPCH-2015-FR-COICOP
-    
     TODO: option references avec limit sur 1 dataset
     """
 
@@ -201,7 +203,7 @@ def dataflow_2_1(agencyID=None, resourceID=None, version="latest"):
         "version": "1.0"
     }
     
-    tmpl = render_template('2.1/dataflow.xml', **context)
+    tmpl = render_template('sdmx/2.1/dataflow.xml', **context)
     response = make_response(tmpl)
     response.headers["Content-Type"] = "application/xml"
     return response
@@ -209,7 +211,7 @@ def dataflow_2_1(agencyID=None, resourceID=None, version="latest"):
 @bp.route('/conceptscheme/<agencyID>/<resourceID>', defaults={"version": "latest", "itemID": None}, endpoint="2-1-conceptscheme")
 @bp.route('/conceptscheme/<agencyID>/<resourceID>/<version>', defaults={"version": "latest", "itemID": None})
 @bp.route('/conceptscheme/<agencyID>/<resourceID>/<version>/<itemID>')
-@cache.memoize(360, make_name=func_cache_with_args)
+@cache.memoize(360, make_name=func_cache_with_args, unless=optional_cache)
 def conceptscheme_2_1(agencyID, resourceID, version="latest", itemID=None):
 
     references = request.args.get('references')
@@ -244,7 +246,7 @@ def conceptscheme_2_1(agencyID, resourceID, version="latest", itemID=None):
         "version": "1.0"
     }
     
-    tmpl = render_template('2.1/conceptscheme.xml', **context)
+    tmpl = render_template('sdmx/2.1/conceptscheme.xml', **context)
     response = make_response(tmpl)
     response.headers["Content-Type"] = "application/xml"      
     return response
@@ -252,7 +254,7 @@ def conceptscheme_2_1(agencyID, resourceID, version="latest", itemID=None):
 @bp.route('/codelist/<agencyID>/<resourceID>', defaults={"version": "latest", "itemID": None}, endpoint="2-1-codelist")
 @bp.route('/codelist/<agencyID>/<resourceID>/<version>', defaults={"version": "latest", "itemID": None})
 @bp.route('/codelist/<agencyID>/<resourceID>/<version>/<itemID>')
-@cache.memoize(360, make_name=func_cache_with_args)
+@cache.memoize(360, make_name=func_cache_with_args, unless=optional_cache)
 def codelist_2_1(agencyID, resourceID, version="latest", itemID=None):
 
     references = request.args.get('references')
@@ -290,7 +292,7 @@ def codelist_2_1(agencyID, resourceID, version="latest", itemID=None):
         context["time_period_concept"] = "time_period" in doc.get("concepts")
         context["obs_value_concept"] = "obs_value" in doc.get("concepts")
     
-    tmpl = render_template('2.1/codelist.xml', **context)
+    tmpl = render_template('sdmx/2.1/codelist.xml', **context)
     response = make_response(tmpl)
     response.headers["Content-Type"] = "application/xml"      
     return response

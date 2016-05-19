@@ -1,0 +1,86 @@
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js" type="text/javascript"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/languages/json.min.js" type="text/javascript"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.1/URI.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename="vendors/jquery.spin.js") }}"></script>
+	
+    <script type="text/javascript">
+    
+    var widukind_options = {
+   	    spin_opts: {
+   	          lines: 13 // The number of lines to draw
+   	        , length: 28 // The length of each line
+   	        , width: 14 // The line thickness
+   	        , radius: 42 // The radius of the inner circle
+   	        , scale: 3 // Scales overall size of the spinner
+   	        , corners: 1 // Corner roundness (0..1)
+   	        , color: '#000' // #rgb or #rrggbb or array of colors
+   	        , opacity: 0.2 // Opacity of the lines
+   	        , rotate: 0 // The rotation offset
+   	        , direction: 1 // 1: clockwise, -1: counterclockwise
+   	        , speed: 1 // Rounds per second
+   	        , trail: 60 // Afterglow percentage
+   	        , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+   	        , zIndex: 2e9 // The z-index (defaults to 2000000000)
+   	        , className: 'spinner' // The CSS class to assign to the spinner
+   	        , top: '50%' // Top position relative to parent
+   	        , left: '50%' // Left position relative to parent
+   	        , shadow: true // Whether to render a shadow
+   	        , hwaccel: false // Whether to use hardware acceleration
+   	        //, position: 'absolute' // Element positioning
+   	    }
+   	};
+    
+    hljs.configure({
+    	useBR: false,
+    	//languages: ["html"],
+    	tabReplace: '   ',
+    });
+    
+    $(document).ready(function(){
+
+    	function highlight_run(){
+	    	$('pre code').each(function(i, block) {
+				hljs.highlightBlock(block);
+	    	});
+    	}
+    	
+        $(".ajax").click(function(e){
+            e.preventDefault();
+            var button = $(this);
+            var input_field = button.parent().parent().find("input:first");
+            var output_field = button.parent().parent().parent().parent().find("pre code:first");
+            var url = input_field.val();
+            var _uri = URI(url).resource();
+            $(button).spin(widukind_options.spin_opts);
+ 		   	$.ajax({
+		        url: _uri,
+		        complete: function(jqXHR, textStatus){
+		        	output_field.text(jqXHR.responseText);
+		        	highlight_run();
+		        	$(button).spin(false);
+		        }
+		   	}).done(function (data, textStatus, xhr) {
+		   		$(button).spin(false);
+		   	});
+        });
+        
+        $(".clear").click(function(e){
+            e.preventDefault();
+            var button = $(this);
+            var output_field = button.parent().parent().parent().parent().find("pre code:first");
+            output_field.empty();
+        });
+        
+        $('#btn-collapse-all').on('click', function (e) {
+        	$('.collapse').collapse('hide')
+        });          
+        
+        $('#btn-expand-all').on('click', function (e) {
+        	$('.collapse').collapse('show')
+        });          
+        
+    	
+    });
+    
+    </script>

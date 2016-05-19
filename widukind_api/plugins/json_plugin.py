@@ -57,8 +57,22 @@ def providers_datasets_list(provider):
                   "enable": False, "lock": False,
                   "concepts": False, "codelists": False}
     #docs = [doc for doc in queries.col_datasets().find(query, projection)]
-    docs = [doc for doc in queries.col_datasets().find(query, projection)]
-    return json_tools.json_response(docs)
+    docs = queries.col_datasets().find(query, projection)
+    
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=10, type=int)
+    if per_page > 50:
+        per_page = 50
+    pagination = queries.Pagination(docs, page, per_page)
+    meta = {
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "per_page": pagination.per_page,
+        "total": pagination.total,
+    }
+    _docs = [doc for doc in pagination.items]
+    #return json_tools.json_response(_docs, meta=meta)
+    return json_tools.json_response_async(_docs, meta=meta)
 
 #---/providers/<provider>/datasets/keys
 
@@ -88,16 +102,21 @@ def datasets_series_list(dataset):
     
     query = queries.complex_queries_series(query)
 
-    limit = request.args.get('limit', default=1000, type=int)
-    
     docs = queries.col_series().find(query, projection)
 
-    if limit:
-        docs= docs.limit(limit)
-    
-    _docs = [doc for doc in docs]
-    
-    return json_tools.json_response(_docs)
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=20, type=int)
+    if per_page > 100:
+        per_page = 100
+    pagination = queries.Pagination(docs, page, per_page)
+    meta = {
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "per_page": pagination.per_page,
+        "total": pagination.total,
+    }
+    _docs = [doc for doc in pagination.items]
+    return json_tools.json_response(_docs, meta=meta)
 
 """
 @bp.route('/category/<slug>', endpoint="category")
@@ -144,9 +163,6 @@ def dataset_unit_frequencies(dataset):
 
 @bp.route('/datasets/<dataset>/values', endpoint="datasets-series-list-values")
 def dataset_series_list_values(dataset):
-    """
-    http://127.0.0.1:8081/api/v1/json/datasets/insee-ipch-2015-fr-coicop/values?limit=10&tags=national+equipment&produit=00+09112
-    """
 
     query = {'enable': True, 'slug': dataset}
     projection = {"_id": False, "provider_name": True, "dataset_code": True }
@@ -166,15 +182,21 @@ def dataset_series_list_values(dataset):
     }
 
     query = queries.complex_queries_series(query)
-
-    limit = request.args.get('limit', default=1000, type=int)
-    
     docs = queries.col_series().find(query, projection)
-    if limit:
-        docs = docs.limit(limit)
 
-    _docs = [doc for doc in docs]
-    return json_tools.json_response_async(_docs)
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=50, type=int)
+    if per_page > 1000:
+        per_page = 1000
+    pagination = queries.Pagination(docs, page, per_page)
+    meta = {
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "per_page": pagination.per_page,
+        "total": pagination.total,
+    }
+    _docs = [doc for doc in pagination.items]
+    return json_tools.json_response_async(_docs, meta=meta)
                     
 
 """
