@@ -292,3 +292,17 @@
 </div>
 {% endmacro %}
 
+{% macro parameter_html_format(require=False) %}
+<div class="well well-sm">
+<h5><strong>format:</strong></h5>
+<ul>
+	<li>Description: Download format</li>	
+	<li>Required: {{ _require(require) }}</li>
+	<li>Type: str</li>	
+	<li>Default: html</li>	
+	<li>Example: ?format=xls</li>
+	<li>Available values : excel, xls, xlsx, calc</li>	
+</ul>
+</div>
+{% endmacro %}
+

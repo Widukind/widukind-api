@@ -63,9 +63,11 @@
 
 {{ param.parameter_tags() }}
 
-{{ param.parameter_limit() }}
+{{ param.parameter_limit(default_value=1000, max_value=None) }}
 
 {{ param.parameter_decimal_separator() }}
+
+{{ param.parameter_html_format() }}
 
 {% endcall %}
 
