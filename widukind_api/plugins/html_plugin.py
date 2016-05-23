@@ -4,11 +4,13 @@ import time
 from collections import OrderedDict
 
 from flask import request, Blueprint, abort, render_template, current_app
+from flask import make_response
 
 import pandas
 
 from widukind_api import queries
 from widukind_common.flask_utils import json_tools
+from widukind_common.tasks.export_files import generate_filename
 
 bp = Blueprint('html', __name__, template_folder='templates')
 eviews_bp = Blueprint('eviews', __name__, template_folder='templates')
@@ -69,12 +71,10 @@ def _dataset_values(provider_name=None, dataset_code=None,
     query['provider_name'] = provider_name
     query['dataset_code'] = dataset_code
 
-    limit = request.args.get('limit', default=1000, type=int)
-    if not frequency:
-        frequency = request.args.get('frequency')
-    if not frequency:
-        abort(400, "frequency field is required.")
-        
+    _format = request.args.get('format', default='html')
+
+    limit = request.args.get('limit', default=0, type=int)
+    
     query['frequency'] = frequency
 
     separator = request.args.get('separator', default=separator)
@@ -83,11 +83,19 @@ def _dataset_values(provider_name=None, dataset_code=None,
     
     query = queries.complex_queries_series(query, 
                                    search_attributes=False, 
-                                   bypass_args=['limit', 'tags', 'provider', 'dataset', 'frequency', 'separator'])    
+                                   bypass_args=['limit', 'tags', 'provider', 'dataset', 'frequency', 'separator', 'format'])    
     
     start = time.time()
     
-    cursor = queries.col_series().find(query).limit(limit)
+    cursor = queries.col_series().find(query)
+    
+    max_limit = current_app.config.get("WIDUKIND_DISPLAY_LIMIT", 1000)
+    
+    if limit:
+        cursor = cursor.limit(limit)
+    else:
+        if cursor.count() > max_limit:
+            abort(400, "The number of result exceeds the allowed limit [%s]. You must use the limit parameter in the query." % max_limit)
 
     if cursor.count() == 0:
         dates, series_keys, series_names, values = [], [], [], []
@@ -106,7 +114,42 @@ def _dataset_values(provider_name=None, dataset_code=None,
     msg = "eviews-series - provider[%s] - dataset[%s] - frequency[%s] - limit[%s] - duration[%.3f]"
     current_app.logger.info(msg % (provider_name, dataset_code, frequency, limit, end))
     
-    return render_template("html/values.html", **context)
+    response_str = render_template("html/values.html", **context)
+    
+    """
+    TODO: use lang browser pour choix separator ?
+    TODO: header lang ?
+    """
+    
+    EXTENSIONS_MAP = {
+        "excel": ("xls", "application/vnd.ms-excel"),
+        "xls": ("xls", "application/vnd.ms-excel"),
+        "xlsx": ("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+        "calc": ("ods", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    }
+    
+    if _format and _format in EXTENSIONS_MAP:
+        response = make_response(response_str)
+
+        _ext = EXTENSIONS_MAP[_format][0]
+        content_type = EXTENSIONS_MAP[_format][1]
+        
+        filename = generate_filename(provider_name=provider_name, 
+                                     dataset_code=dataset_code, 
+                                     #key=key,
+                                     #slug=slug, 
+                                     prefix="series-list")
+
+        filename = "%s.%s" % (filename, _ext)
+        response.headers['Content-Type'] = content_type
+        response.headers["Content-disposition"] = "attachment; filename=%s" % filename
+        #response.content_length = fileobj.length
+        #TODO: response.last_modified = fileobj.upload_date
+        #TODO: response.set_etag(fileobj.md5)
+        response.make_conditional(request)
+        return response
+    
+    return response_str
 
 
 #---/providers
@@ -248,10 +291,22 @@ def dataset_unit_frequencies(dataset):
 def dataset_series_list_values(dataset, frequency=None):
 
     query = {"slug": dataset}
-    projection = {"_id": False, "provider_name": True, "dataset_code": True, "enable": True}
+    projection = {"_id": False, 
+                  "provider_name": True, "dataset_code": True,
+                  "metadata.frequencies": True, 
+                  "enable": True}
     dataset = queries.col_datasets().find_one(query, projection)
     if not dataset:
         abort(404, "dataset %s not found or disable." % dataset)
+
+    if not frequency:
+        frequency = request.args.get('frequency')
+    if not frequency:
+        abort(400, "frequency field is required.")
+    
+    frequencies = dataset.get("metadata", {}).get("frequencies", [])
+    if frequencies and not frequency in frequencies:
+        abort(404, "Frequencies available: %s" % frequencies)  
     
     return _dataset_values(dataset["provider_name"], 
                                   dataset["dataset_code"],
@@ -263,10 +318,22 @@ def dataset_series_list_values(dataset, frequency=None):
 @eviews_bp.route('/<provider>/dataset/<dataset_code>/<frequency>/values')
 def dataset_series_list_values_by_dataset_code(provider=None, dataset_code=None, frequency=None):
     query = {"provider_name": provider, "dataset_code": dataset_code}
-    projection = {"_id": False, "provider_name": True, "dataset_code": True, "enable": True}
+    projection = {"_id": False, 
+                  "provider_name": True, "dataset_code": True,
+                  "metadata.frequencies": True, 
+                  "enable": True}
     dataset = queries.col_datasets().find_one(query, projection)
     if not dataset:
         abort(404, "dataset %s/%s not found or disable." % (provider, dataset_code))
+
+    if not frequency:
+        frequency = request.args.get('frequency')
+    if not frequency:
+        abort(400, "frequency field is required.")
+
+    frequencies = dataset.get("metadata", {}).get("frequencies", [])
+    if frequencies and not frequency in frequencies:
+        abort(404, "Frequencies available: %s" % frequencies)  
 
     return _dataset_values(provider, dataset_code, frequency=frequency)
 

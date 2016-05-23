@@ -104,8 +104,8 @@ def data_query(dataset_code, provider_name=None, filters=None,
     if filters and filters != "all": 
         _filters = filters.split(".")
         if not len(_filters) == len(dataset_doc["dimension_keys"]):
-            print("abort no filters !", len(_filters), len(dataset_doc["dimension_keys"]))
-            abort(404)
+            #print("abort filter required !", len(_filters), len(dataset_doc["dimension_keys"]))
+            abort(404, "abort filter required !")
         for i, dim in enumerate(dataset_doc["dimension_keys"]):
             if not _filters[i]:
                 continue
