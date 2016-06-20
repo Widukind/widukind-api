@@ -236,14 +236,14 @@ def _conf_bp(app):
     
 def _conf_errors(app):
     
-    from werkzeug import exceptions as ex
+    from werkzeug.exceptions import HTTPException
 
-    class DisabledElement(ex.HTTPException):
+    class DisabledElement(HTTPException):
         code = 307
         description = 'Disabled element'
     abort.mapping[307] = DisabledElement
 
-    @app.errorhandler(307)
+    @app.errorhandler(DisabledElement)
     def disable_error(error):
         is_json = request.args.get('json') or request.is_xhr
         values = dict(code=307, error="307 Error", original_error=str(error))
