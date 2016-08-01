@@ -163,9 +163,12 @@ def _conf_sentry(app):
     except ImportError:
         pass
     
-def _conf_db(app):
+def _conf_db(app, db=None):
     from widukind_common.utils import get_mongo_db
-    app.widukind_db = get_mongo_db(app.config.get("MONGODB_URL"), connect=False)
+    if not db:
+        app.widukind_db = get_mongo_db(app.config.get("MONGODB_URL").strip('"'), connect=False)
+    else:
+        app.widukind_db = db
 
 def _conf_session(app):
     from widukind_common.flask_utils.mongo_session import PyMongoSessionInterface
@@ -321,14 +324,14 @@ def _conf_cors(app):
     CORS(app, 
          send_wildcard=True, methods=["GET"], resources={r"/api/v1/*": {"origins": "*"}})
 
-def create_app(config='widukind_api.settings.Prod'):
+def create_app(config='widukind_api.settings.Prod', db=None):
     
     env_config = config_from_env('WIDUKIND_API_SETTINGS', config)
     
     app = Flask(__name__)
     app.config.from_object(env_config)    
 
-    _conf_db(app)
+    _conf_db(app, db=db)
 
     app.config['LOGGER_NAME'] = 'widukind_api'
     app._logger = _conf_logging(debug=app.debug, prog_name='widukind_api')
