@@ -166,7 +166,7 @@ def _conf_sentry(app):
 def _conf_db(app, db=None):
     from widukind_common.utils import get_mongo_db
     if not db:
-        app.widukind_db = get_mongo_db(app.config.get("MONGODB_URL"), connect=False)
+        app.widukind_db = get_mongo_db(app.config.get("MONGODB_URL").strip('"'), connect=False)
     else:
         app.widukind_db = db
 
