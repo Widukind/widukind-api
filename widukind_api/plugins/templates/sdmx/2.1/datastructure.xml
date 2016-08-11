@@ -12,9 +12,9 @@
   </mes:Header>
   <mes:Structures>
 	{%- if load_all %}
-	{% include "2.1/inc_dataflow.xml" with context %}
-	{% include "2.1/inc_codelist.xml" with context %}
-	{% include "2.1/inc_conceptscheme.xml" with context %}
+	{% include "sdmx/2.1/inc_dataflow.xml" with context %}
+	{% include "sdmx/2.1/inc_codelist.xml" with context %}
+	{% include "sdmx/2.1/inc_conceptscheme.xml" with context %}
 	{%- endif %}    
 	<str:DataStructures>
 		<str:DataStructure id="{{dataset.dataset_code}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=WIDUKIND:{{dataset.dataset_code}}({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
