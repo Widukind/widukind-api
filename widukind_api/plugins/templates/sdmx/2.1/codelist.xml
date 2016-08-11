@@ -11,9 +11,9 @@
     <mes:Receiver id="unknown"/>
   </mes:Header>
   <mes:Structures>
-    {% include "2.1/inc_codelist.xml" with context %}
+    {% include "sdmx/2.1/inc_codelist.xml" with context %}
     {% if load_all %}
-    {% include "2.1/inc_conceptscheme.xml" with context %}
+    {% include "sdmx/2.1/inc_conceptscheme.xml" with context %}
     {% endif %}    
   </mes:Structures>
 </mes:Structure>
