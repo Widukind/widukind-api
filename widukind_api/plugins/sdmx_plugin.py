@@ -34,9 +34,9 @@ def data_2_1(flowRef, key=None, providerRef=None, version="all"):
         tmpl_choice = 'sdmx/2.1/data-specific.xml'
 
     limit = request.args.get('limit', default=200, type=int)
-    if limit > 1000:
-        limit = 1000
-    
+    if limit > 5000:
+        limit = 5000
+
     start_period = request.args.get('startPeriod')
     end_period = request.args.get('endPeriod')
     
