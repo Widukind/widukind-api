@@ -17,11 +17,11 @@
 	{%- for date in dates %}
 	{%- set index = loop.index0 %}
 	<tr>
-		<td>{{date}}</td>	
+		<td>{{date}}</td>
 		{%- for cols in values %}
 		<td>{{cols[index]}}</td>
 		{%- endfor %}
 	</tr>
-	{%- endfor %}	
+	{%- endfor %}
 	</tbody>
 </table>

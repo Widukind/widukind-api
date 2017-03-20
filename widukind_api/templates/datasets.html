@@ -17,11 +17,11 @@
 	<tr>
 		<td class="col-md-10">
 			<a target="_blank" href="{{config.WIDUKIND_WEB_URL}}/views/slug/dataset/{{ dataset.slug }}">{{ dataset.name }} ({{ dataset.dataset_code }})</a>
-		</td>	
+		</td>
 		<td class="col-md-1">
 			<a target="_blank" href="{{ url_for("json.dataset", slug=dataset.slug) }}">JSON</a>
-		</td>	
-	</tr>			
+		</td>
+	</tr>
 	{% endfor %}
 {% endfor %}
 </table>

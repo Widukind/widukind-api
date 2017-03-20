@@ -4,7 +4,7 @@ import os
 
 from widukind_common import tests_tools as utils
 
-from widukind_common.tests.flask_base_tests import BaseFlaskTestCase 
+from widukind_common.tests.flask_base_tests import BaseFlaskTestCase
 
 from widukind_api import constants
 
@@ -26,7 +26,7 @@ REFERENTIEL = {
     },
     "tags": {
         "count": 51,
-    },               
+    },
 }
 
 def create_fixtures(db):
@@ -56,9 +56,9 @@ def create_fixtures(db):
                 d['metadata'] = {}
         result = db[collection].insert_many(datas)
         #print(collection, " : ", len(result.inserted_ids))
-            
+
 class TestCase(BaseFlaskTestCase):
-    
+
     def setUp(self):
         super().setUp()
         self.assertEqual(self.db.name, "widukind_test")
@@ -67,9 +67,9 @@ class TestCase(BaseFlaskTestCase):
         from widukind_api import wsgi
         app = wsgi.create_app('widukind_api.settings.Test', db=self.db)
         return app
-    
+
     def fixtures(self):
         create_fixtures(self.db)
-    
+
     def clean_db(self):
         utils.clean_mongodb(collection_list=constants.COL_ALL, db=self.db)

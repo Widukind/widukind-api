@@ -1,7 +1,7 @@
 <?xml version="{{ version }}" encoding="UTF-8"?>
-<mes:Structure 
-	xmlns:mes="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" 
-	xmlns:com="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common" 
+<mes:Structure
+	xmlns:mes="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message"
+	xmlns:com="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common"
 	xmlns:str="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure">
   <mes:Header>
     <mes:ID>{{message_id}}</mes:ID>
@@ -15,7 +15,7 @@
 	{% include "sdmx/2.1/inc_dataflow.xml" with context %}
 	{% include "sdmx/2.1/inc_codelist.xml" with context %}
 	{% include "sdmx/2.1/inc_conceptscheme.xml" with context %}
-	{%- endif %}    
+	{%- endif %}
 	<str:DataStructures>
 		<str:DataStructure id="{{dataset.dataset_code}}" urn="urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=WIDUKIND:{{dataset.dataset_code}}({{ version }})" agencyID="{{ dataset.provider_name }}" version="{{ version }}">
 			<com:Name xml:lang="en">{{dataset.name}}</com:Name>
@@ -73,7 +73,7 @@
                   <Ref id="PRODUIT"/>
                 </str:Dimension>
               </str:AttributeRelationship>
-              #}              
+              #}
             </str:Attribute>
             {% endfor -%}
           </str:AttributeList>

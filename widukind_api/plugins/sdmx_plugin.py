@@ -27,7 +27,7 @@ def optional_cache():
 @bp.route('/data/<flowRef>/<key>/<providerRef>')
 @bp.route('/data/<providerRef>/<flowRef>/<key>')
 def data_2_1(flowRef, key=None, providerRef=None, version="all"):
-    
+
     if "application/vnd.sdmx.genericdata+xml;version=2.1" in request.headers.get("Accept", None):
         tmpl_choice = 'sdmx/2.1/data-generic.xml'
     else:
@@ -39,21 +39,21 @@ def data_2_1(flowRef, key=None, providerRef=None, version="all"):
 
     start_period = request.args.get('startPeriod')
     end_period = request.args.get('endPeriod')
-    
+
     if key:
         key = key.lower()
-    
-    datas = queries.data_query(flowRef, 
-                               provider_name=providerRef, 
-                               filters=key, 
-                               start_period=start_period, 
-                               end_period=end_period, 
+
+    datas = queries.data_query(flowRef,
+                               provider_name=providerRef,
+                               filters=key,
+                               start_period=start_period,
+                               end_period=end_period,
                                limit=limit,
                                get_ordinal_func=get_ordinal_from_period)
 
     tmpl = render_template(tmpl_choice, version="1.0", **datas)
     resp = make_response(tmpl)
-    resp.headers["Content-Type"] = "application/xml"      
+    resp.headers["Content-Type"] = "application/xml"
     return resp
 
 """
@@ -66,15 +66,15 @@ protocol://ws-entry-point/resource/flowRef/key/providerRef
 TODO: flowRef: AGENCY_ID,FLOW_ID,VERSION
 TODO: providerRef: AGENCY_ID,PROVIDER_ID
 
-firstNObservations 
+firstNObservations
     Nombre maximum d'observation par series
-lastNObservations 
+lastNObservations
     Maximum number of observations counting back from the most recent observation
-dimensionAtObservation 
+dimensionAtObservation
     Id fof the dimension attached at the observation level TIME_PERIOD
-detail 
+detail
     Desired amount of information to be returned. Values: full, dataonly, serieskeysonly, nodata full
-includeHistory 
+includeHistory
     Whether to return vintages false
 updatedAfter
     2009-05-15T14%3A15%3A00%2B01%3A00
@@ -85,18 +85,18 @@ Period format:
     Monthly YYYY-MM
     Quarterly YYYY-Q[1-4]
     Semi-annual YYYY-S[1-2]        # TODO: exclude
-    Annual YYYY    
+    Annual YYYY
 
 
 #TODO: If-Modified-Since / Last-Modified
 
 > request:
     If-Modified-Since: Wed, 03 Feb 2016 11:28:46 GMT
-> response: 
+> response:
     Status Code: 304 Not Modified
 > request:
     If-Modified-Since: Wed, 03 Feb 2016 11:35:46 GMT
-> response: 
+> response:
     Status Code: 200 OK
     Date: Wed, 03 Feb 2016 11:32:31 GMT
     Expires: Wed, 03 Feb 2016 11:32:31 GMT
@@ -107,10 +107,10 @@ Period format:
 """
 itemID: only conceptscheme and agencyscheme
 
-datastructure, 
-dataflow, 
+datastructure,
+dataflow,
     XML Dataflow: Categorisation, Process, Constraint, DataStructureDefinition, ProvisionAgreement, ReportingTaxonomy, StructureSet
-    
+
 codelist ?
 conceptscheme ?
 categorisation / categoryscheme
@@ -133,11 +133,11 @@ def dsd_2_1(agencyID, resourceID, version="latest"):
     http://127.0.0.1:8081/api/v1/sdmx/datastructure/INSEE/IPCH-2015-FR-COICOP
 
     http://127.0.0.1:8081/api/v1/sdmx/datastructure/all/IPC-2015-COICOP/latest/?references=children
-    
+
     http://127.0.0.1:8081/api/v1/sdmx/datastructure/all/IPCH-2015-FR-COICOP/latest/?references=children
-    
+
     > attendu:
-    "2016-01-23T09:09:42.771Z"    
+    "2016-01-23T09:09:42.771Z"
     "2013-07-10T11:00:00.000Z","%Y-%m-%dT%H:%M:%S.%fZ")
     "2013-07-12T07:00:00Z","%Y-%m-%dT%H:%M:%SZ"
     datetime.datetime.utcnow().isoformat() + "Z"
@@ -146,20 +146,20 @@ def dsd_2_1(agencyID, resourceID, version="latest"):
     """
 
     references = request.args.get('references')
-    
+
     query_ds = {'enable': True,
                 'provider_name': agencyID,
                 'dataset_code': resourceID}
     projection_ds = {"tags": False, "_id": False}
     doc = queries.col_datasets().find_one(query_ds, projection_ds)
-    
+
     if not doc:
         abort(404)
 
     now = "%sZ" % str(datetime.utcnow().isoformat())
     context = {
         "dataset": doc,
-        "datasets": [doc],        
+        "datasets": [doc],
         "time_period_concept": "TIME_PERIOD" in doc.get("concepts"),
         "obs_value_concept": "OBS_VALUE" in doc.get("concepts"),
         "load_all": references in ["children", "descendants", "all"],
@@ -167,10 +167,10 @@ def dsd_2_1(agencyID, resourceID, version="latest"):
         "prepared_date": now,
         "version": "1.0"
     }
-    
+
     tmpl = render_template('sdmx/2.1/datastructure.xml', **context)
     response = make_response(tmpl)
-    response.headers["Content-Type"] = "application/xml"      
+    response.headers["Content-Type"] = "application/xml"
     return response
 
 @bp.route('/dataflow', endpoint="2-1-dataflow")
@@ -184,17 +184,17 @@ def dataflow_2_1(agencyID=None, resourceID=None, version="latest"):
     """
 
     references = request.args.get('references')
-    
+
     query_ds = {'enable': True}
     if agencyID:
         query_ds["provider_name"] = agencyID.upper()
     if resourceID:
         query_ds["dataset_code"] = resourceID
-    
-    projection_ds = {"_id": False, 
+
+    projection_ds = {"_id": False,
                      "provider_name": True, "dataset_code": True, "name": True}
     docs = queries.col_datasets().find(query_ds, projection_ds)
-    
+
     now = "%sZ" % str(datetime.utcnow().isoformat())
     context = {
         "datasets": docs,
@@ -202,7 +202,7 @@ def dataflow_2_1(agencyID=None, resourceID=None, version="latest"):
         "prepared_date": now,
         "version": "1.0"
     }
-    
+
     tmpl = render_template('sdmx/2.1/dataflow.xml', **context)
     response = make_response(tmpl)
     response.headers["Content-Type"] = "application/xml"
@@ -215,23 +215,23 @@ def dataflow_2_1(agencyID=None, resourceID=None, version="latest"):
 def conceptscheme_2_1(agencyID, resourceID, version="latest", itemID=None):
 
     references = request.args.get('references')
-    
+
     query_ds = {'enable': True,
                 'provider_name': agencyID,
                 'dataset_code': resourceID}
-    
+
     projection_ds = {"_id": False, "tags": False}
-    
+
     if not references or not references in ["children", "descendants", "all"]:
         projection_ds["codelists"] = False
     #TODO: itemID et repercussion sur codelists !
     #if itemID:
     #    projection_ds["concepts.%s" % itemID] = True
-    
+
     #print("query_ds : ", query_ds)
-    
+
     doc = queries.col_datasets().find_one(query_ds, projection_ds)
-    
+
     if not doc:
         abort(404)
 
@@ -245,10 +245,10 @@ def conceptscheme_2_1(agencyID, resourceID, version="latest", itemID=None):
         "prepared_date": now,
         "version": "1.0"
     }
-    
+
     tmpl = render_template('sdmx/2.1/conceptscheme.xml', **context)
     response = make_response(tmpl)
-    response.headers["Content-Type"] = "application/xml"      
+    response.headers["Content-Type"] = "application/xml"
     return response
 
 @bp.route('/codelist/<agencyID>/<resourceID>', defaults={"version": "latest", "itemID": None}, endpoint="2-1-codelist")
@@ -258,13 +258,13 @@ def conceptscheme_2_1(agencyID, resourceID, version="latest", itemID=None):
 def codelist_2_1(agencyID, resourceID, version="latest", itemID=None):
 
     references = request.args.get('references')
-    
+
     query_ds = {'enable': True,
                 'provider_name': agencyID,
                 'dataset_code': resourceID}
-    
+
     projection_ds = {"_id": False, "tags": False}
-    
+
     #is_concepts = references and references in ["children", "descendants", "all"]
     #if not is_concepts:
     #    projection_ds["concepts"] = False
@@ -272,11 +272,11 @@ def codelist_2_1(agencyID, resourceID, version="latest", itemID=None):
     #TODO: itemID et repercussion sur codelists !
     #if itemID:
     #    projection_ds["concepts.%s" % itemID] = True
-    
+
     #print("query_ds : ", query_ds)
-    
+
     doc = queries.col_datasets().find_one(query_ds, projection_ds)
-    
+
     if not doc:
         abort(404)
 
@@ -291,8 +291,8 @@ def codelist_2_1(agencyID, resourceID, version="latest", itemID=None):
     if is_concepts:
         context["time_period_concept"] = "time_period" in doc.get("concepts")
         context["obs_value_concept"] = "obs_value" in doc.get("concepts")
-    
+
     tmpl = render_template('sdmx/2.1/codelist.xml', **context)
     response = make_response(tmpl)
-    response.headers["Content-Type"] = "application/xml"      
+    response.headers["Content-Type"] = "application/xml"
     return response

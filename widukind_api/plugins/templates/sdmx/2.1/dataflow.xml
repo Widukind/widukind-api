@@ -1,7 +1,7 @@
 <?xml version="{{ version }}" encoding="UTF-8"?>
-<mes:Structure 
-	xmlns:mes="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" 
-	xmlns:com="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common" 
+<mes:Structure
+	xmlns:mes="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message"
+	xmlns:com="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common"
 	xmlns:str="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure">
   <mes:Header>
     <mes:ID>{{message_id}}</mes:ID>

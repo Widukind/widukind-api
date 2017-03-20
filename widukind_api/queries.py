@@ -15,30 +15,30 @@ from widukind_common.flask_utils.queries import *
 logger = logging.getLogger(__name__)
 
 def data_aggregate(query, start_period=None, end_period=None, limit=None, db=None):
-    
+
     start = time.time()
-    
+
     project = {
         '_id': 0,
         'key': 1,
         'name': 1,
-        'values.period': 1, 
+        'values.period': 1,
         'values.value': 1,
-        'values.ordinal': 1, 
+        'values.ordinal': 1,
         'dimensions': 1,
         'attributes': 1,
     }
-    
+
     match_values = None
-    
+
     if start_period and end_period:
         match_values = {"values.ordinal": {"$gte": start_period, "$lte": end_period}}
-    elif start_period:    
+    elif start_period:
         match_values = {"values.ordinal": {"$gte": start_period}}
-    elif end_period:    
+    elif end_period:
         match_values = {"values.ordinal": {"$lte": end_period}}
-    
-    group = { 
+
+    group = {
         "_id": {
             "key": "$key",
             "name" : "$name",
@@ -47,39 +47,39 @@ def data_aggregate(query, start_period=None, end_period=None, limit=None, db=Non
         },
         "values": {
             "$push": {
-                "value": "$values.value", 
+                "value": "$values.value",
                 "period": "$values.period"
             }
         },
     }
-    
+
     pipeline = []
     pipeline.append({"$match": query})
-    
+
     if limit:
         pipeline.append({"$limit": limit })
-    
+
     pipeline.append({'$project': project})
     pipeline.append({"$unwind": "$values"})
-    
+
     if match_values:
         pipeline.append({"$match": match_values})
-    
+
     pipeline.append({"$group": group })
-    
+
     print("----------------------------------")
     pprint(pipeline)
     print("----------------------------------")
-    
+
     result = list(col_series(db).aggregate(pipeline, allowDiskUse=True))
 
     end = time.time() - start
     msg = "sdmx-data-aggregate - %.3f"
     logger.info(msg % end)
-    
+
     return result
 
-def data_query(dataset_code, provider_name=None, filters=None, 
+def data_query(dataset_code, provider_name=None, filters=None,
                start_period=None, end_period=None,
                limit=None, get_ordinal_func=None, db=None):
 
@@ -89,7 +89,7 @@ def data_query(dataset_code, provider_name=None, filters=None,
     projection_ds = {"name": True, "dataset_code": True, "slug": True,
                      "provider_name": True, "dimension_keys": True}
     dataset_doc = col_datasets(db).find_one(query_ds, projection_ds)
-    
+
     if not dataset_doc:
         abort(404)
 
@@ -100,8 +100,8 @@ def data_query(dataset_code, provider_name=None, filters=None,
 
     query = {"provider_name": dataset_doc["provider_name"],
              "dataset_code": dataset_doc["dataset_code"]}
-    
-    if filters and filters != "all": 
+
+    if filters and filters != "all":
         _filters = filters.split(".")
         if not len(_filters) == len(dataset_doc["dimension_keys"]):
             #print("abort filter required !", len(_filters), len(dataset_doc["dimension_keys"]))
@@ -110,7 +110,7 @@ def data_query(dataset_code, provider_name=None, filters=None,
             if not _filters[i]:
                 continue
             query["dimensions."+ dim] = {"$in": _filters[i].split("+")}
-    
+
     """
     TODO: Compter doc total sans filtrage pour déterminer si obligation filtrage
     """
@@ -118,12 +118,12 @@ def data_query(dataset_code, provider_name=None, filters=None,
     print("--------------- QUERY ----------------------")
     pprint(query)
     print("--------------------------------------------")
-    
+
     if not start_period and not end_period:
         projection = {
             "_id": False,
             "key": True, "name": True,
-            'values.period': True, 'values.value': True, 'values.ordinal': True, 
+            'values.period': True, 'values.value': True, 'values.ordinal': True,
             'dimensions': True, 'attributes': True,
         }
         cursor = col_series(db).find(query, projection)
@@ -131,9 +131,9 @@ def data_query(dataset_code, provider_name=None, filters=None,
             cursor = cursor.limit(limit)
         docs = list(cursor)
     else:
-        cursor = data_aggregate(query, 
-                                start_period=start_period, 
-                                end_period=end_period, 
+        cursor = data_aggregate(query,
+                                start_period=start_period,
+                                end_period=end_period,
                                 limit=limit,
                                 db=db)
         docs = []
@@ -145,11 +145,11 @@ def data_query(dataset_code, provider_name=None, filters=None,
                 "attributes": doc["_id"]["attributes"],
                 "values": doc["values"],
             })
-    
+
     #count = len(docs)
 
     now = str(datetime.utcnow().isoformat())
-    
+
     return {
         "provider_name": dataset_doc["provider_name"],
         "dataset_name": dataset_doc["name"],

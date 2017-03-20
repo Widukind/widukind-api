@@ -13,4 +13,3 @@ ADD docker/gunicorn_conf.py /etc/gunicorn/conf.py
 EXPOSE 8080
 
 CMD ["gunicorn", "-c", "/etc/gunicorn/conf.py", "widukind_api.wsgi:create_app()"]
-

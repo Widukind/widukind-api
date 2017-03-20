@@ -11,4 +11,3 @@ RUN pip install -r requirements/default.txt \
 EXPOSE 8080
 
 CMD ["gunicorn", "-c", "/code/docker/gunicorn_conf.py", "widukind_api.wsgi:create_app()"]
-

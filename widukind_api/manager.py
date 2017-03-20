@@ -15,9 +15,9 @@ try:
     HAS_GEVENT = True
 except ImportError:
     HAS_GEVENT = False
-    pass    
-    
-    
+    pass
+
+
 def _show_config(app=None):
     """
     TODO: ajout version des libs
@@ -26,7 +26,7 @@ def _show_config(app=None):
         app = current_app
     print("-------------------------------------------------------")
     pprint.pprint(dict(app.config))
-    
+
     print("-------------------------------------------------------")
     print("app.root_path          : ", app.root_path)
     print("app.config.root_path   : ", app.config.root_path)
@@ -38,7 +38,7 @@ def _show_config(app=None):
     for e in extensions:
         print (e)
     print("-------------------------------------------------------")
-    
+
 
 def _show_urls():
     order = 'rule'
@@ -47,7 +47,7 @@ def _show_urls():
         methods = ",".join([m for m in list(rule.methods) if not m in ["HEAD", "OPTIONS"]])
         #rule.rule = str passé au début de route()
         print("%-30s" % rule.rule, rule.endpoint, methods)
-    
+
 def _cache_clear(app=None):
     app = app or current_app
     with app.app_context():
@@ -68,39 +68,39 @@ class CacheClearCommand(Command):
 
 class ShowConfigCommand(Command):
     """Affiche la configuration actuelle de l'application"""
-    
+
     def run(self, **kwargs):
-        _show_config()        
+        _show_config()
 
 def main(create_app_func=None):
-    
+
     if not create_app_func:
         from widukind_api.wsgi import create_app
         create_app_func = create_app
-    
+
     class ServerWithGevent(Server):
         help = description = 'Runs the Flask development server with WSGI SocketIO Server'
-    
+
         def __call__(self, app, host, port, use_debugger, use_reloader,
                    threaded, processes, passthrough_errors):
 
             if use_debugger:
                 app = DebuggedApplication(app, evalex=True)
-    
+
             server = WSGIServer((host, port), app)
             try:
                 print('Listening on http://%s:%s' % (host, port))
                 server.serve_forever()
             except KeyboardInterrupt:
                 pass
-    
+
     env_config = config_from_env('WIDUKIND_API_SETTINGS', 'widukind_api.settings.Prod')
-    
-    manager = Manager(create_app_func, 
+
+    manager = Manager(create_app_func,
                       with_default_commands=False)
-    
+
     #TODO: option de config app pour désactiver run counter
-    
+
     manager.add_option('-c', '--config',
                        dest="config",
                        default=env_config)
@@ -121,20 +121,20 @@ def main(create_app_func=None):
     manager.add_command("config", ShowConfigCommand())
     manager.add_command("urls", ShowUrlsCommand())
     manager.add_command("cache-clear", CacheClearCommand())
-    
-    
+
+
     manager.run()
-    
+
 
 if __name__ == "__main__":
     """
     python -m widukind_api.manager server -p 8081 -R
-    
+
     python -m widukind_api.manager -c widukind_api.settings.Dev server -p 8081 -d
-    
+
     python -m widukind_api.manager urls
-    
-    'password' pour tous    
+
+    'password' pour tous
     """
     main()
 

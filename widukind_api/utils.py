@@ -43,13 +43,13 @@ def do_filesizeformat(value, binary=False):
 def stats():
 
     import psutil
-    
+
     pid = os.getpid()
     process = psutil.Process(pid)
 
     try:
         mem = process.memory_info()
-        
+
         result = {
             'mem_rss': round(mem.rss, 2), #do_filesizeformat(mem.rss),
             'mem_vms': round(mem.vms, 2), #do_filesizeformat(mem.vms),
@@ -59,9 +59,9 @@ def stats():
             'connections': len(process.connections()),
         }
         return result
-        
+
     except Exception as err:
         logger.error(str(err))
         return {}
-        
+
 

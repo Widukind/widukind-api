@@ -24,4 +24,3 @@ CHOICES_SORT_SERIES = (
     ("name", "serie name"),
     ("key", "serie key"),
 )
-

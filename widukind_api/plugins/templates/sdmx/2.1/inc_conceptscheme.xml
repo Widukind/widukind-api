@@ -15,6 +15,6 @@
         <str:Concept id="OBS_VALUE" urn="urn:sdmx:org.sdmx.infomodel.conceptscheme.Concept=WIDUKIND:{{dataset.provider_name}}_CONCEPTS({{ version }}).OBS_VALUE">
           <com:Name xml:lang="en">Observation value</com:Name>
         </str:Concept>
-        {% endif -%}                
+        {% endif -%}
       </str:ConceptScheme>
     </str:Concepts>

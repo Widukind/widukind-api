@@ -32,19 +32,19 @@
 	{{ param.parameter_startPeriod() }}
 	{{ param.parameter_endPeriod() }}
 	{{ param.parameter_limit(default_value=200, max_value=1000) }}
-	
+
 <div class="well well-sm">
 <h5><strong>Header Accept:</strong></h5>
 <ul>
-	<li>Description: SDMX format (genericdata or specificdata)</li>	
+	<li>Description: SDMX format (genericdata or specificdata)</li>
 	<li>Default: application/vnd.sdmx.structurespecificdata+xml;version=2.1</li>
 </ul>
 <p>
 For <strong>genericdata</strong>, use <strong>application/vnd.sdmx.genericdata+xml;version=2.1</strong> in Accept header.
 </p>
 </div>
-	
-		
+
+
 {% endcall %}
 
 <h3>Structure (dsd):</h3>

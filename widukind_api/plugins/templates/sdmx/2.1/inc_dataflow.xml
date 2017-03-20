@@ -5,6 +5,6 @@
 			<str:Structure>
 				<Ref id="{{dataset.dataset_code}}" version="{{ version }}" agencyID="{{ dataset.provider_name }}" package="datastructure" class="DataStructure"/>
 			</str:Structure>
-		</str:Dataflow>  	
+		</str:Dataflow>
 	{%- endfor %}
 </str:Dataflows>
