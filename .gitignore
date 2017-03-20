@@ -7,6 +7,7 @@
 *.hgignore
 .tox
 .coverage
+.vscode
 htmlcov
 docs/_build
 dist
