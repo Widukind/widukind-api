@@ -7,7 +7,7 @@ gettext = lambda s: s
 
 class Config(object):
 
-    WIDUKIND_WEB_URL = config('WIDUKIND_API_WEB_URL', "http://widukind.cepremap.org")
+    WIDUKIND_WEB_URL = config('WIDUKIND_API_WEB_URL', "https://db.nomics.world/")
 
     NO_LIMITED_IPS = []
     NO_LIMITED_COUNTRIES = []
